@@ -1,24 +1,27 @@
-//
-// Created by anthony on 12/10/16.
-//
-
+/******************************************************************************
+*include files
+******************************************************************************/
 #include "PrefetcherFactory.h"
 #include "../Constants.h"
 #include "FileSystemPrefetcher.h"
 #include "ObjectStorePrefetcher.h"
-
-
+/******************************************************************************
+*Constructor
+******************************************************************************/
 PrefetcherFactory::PrefetcherFactory() {}
+/******************************************************************************
+*Destructor
+******************************************************************************/
 PrefetcherFactory::~PrefetcherFactory() {}
-
-
+/******************************************************************************
+*Gettters and setters
+******************************************************************************/
 PrefetcherFactory *PrefetcherFactory::getInstance() {
   if(instance== nullptr){
     instance=new PrefetcherFactory();
   }
   return instance;
 }
-
 AbstractPrefetcher* PrefetcherFactory::getPrefetcher(const char *name) {
   AbstractPrefetcher* prefetcherInstance= nullptr;
   if(name == FILESYSTEM_PREFETCHER){

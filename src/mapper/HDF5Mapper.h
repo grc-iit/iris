@@ -6,7 +6,9 @@
 #define IRIS_HDF5MAPPER_H
 
 
-class HDF5Mapper {
+#include "AbstractMapper.h"
+
+class HDF5Mapper: public AbstractMapper {
 
 };
 

@@ -6,7 +6,9 @@
 #define IRIS_S3MAPPER_H
 
 
-class S3Mapper {
+#include "AbstractMapper.h"
+
+class S3Mapper: public AbstractMapper {
 
 };
 

@@ -6,7 +6,9 @@
 #define IRIS_MPIIOMAPPER_H
 
 
-class MPIIOMapper {
+#include "AbstractMapper.h"
+
+class MPIIOMapper: public AbstractMapper {
 
 };
 

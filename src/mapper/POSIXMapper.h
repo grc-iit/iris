@@ -6,7 +6,9 @@
 #define IRIS_POSIXMAPPER_H
 
 
-class POSIXMapper {
+#include "AbstractMapper.h"
+
+class POSIXMapper: public AbstractMapper {
 
 };
 

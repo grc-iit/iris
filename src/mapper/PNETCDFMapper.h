@@ -6,7 +6,9 @@
 #define IRIS_PNETCDFMAPPER_H
 
 
-class PNETCDFMapper {
+#include "AbstractMapper.h"
+
+class PNETCDFMapper: public AbstractMapper {
 
 };
 
