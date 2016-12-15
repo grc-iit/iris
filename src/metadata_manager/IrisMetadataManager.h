@@ -6,7 +6,9 @@
 #define IRIS_LIBRARYMETADATAMANAGER_H
 
 
-class LibraryMetadataManager {
+#include "AbstractMetadataManager.h"
+
+class IrisMetadataManager: public AbstractMetadataManager {
 
 };
 

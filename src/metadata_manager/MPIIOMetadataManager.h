@@ -6,7 +6,9 @@
 #define IRIS_MPIIOMETADATAMANAGER_H
 
 
-class MPIIOMetadataManager {
+#include "AbstractMetadataManager.h"
+
+class MPIIOMetadataManager: public AbstractMetadataManager {
 
 };
 

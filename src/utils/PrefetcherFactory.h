@@ -10,11 +10,13 @@
 
 class PrefetcherFactory {
 private:
-    static PrefetcherFactory* instance;
-    PrefetcherFactory(){}
+  static PrefetcherFactory* instance;
+  PrefetcherFactory();
+  virtual ~PrefetcherFactory();
+
 public:
-    static PrefetcherFactory* getInstance();
-    AbstractPrefetcher* getPrefetcher(const char* name);
+  static PrefetcherFactory* getInstance();
+  AbstractPrefetcher* getPrefetcher(const char* name);
 };
 
 

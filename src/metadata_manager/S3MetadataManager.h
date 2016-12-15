@@ -6,7 +6,9 @@
 #define IRIS_S3METADATAMANAGER_H
 
 
-class S3MetadataManager {
+#include "AbstractMetadataManager.h"
+
+class S3MetadataManager: public AbstractMetadataManager {
 
 };
 

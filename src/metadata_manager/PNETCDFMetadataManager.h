@@ -6,7 +6,9 @@
 #define IRIS_PNETCDFMETADATAMANAGER_H
 
 
-class PNETCDFMetadataManager {
+#include "AbstractMetadataManager.h"
+
+class PNETCDFMetadataManager: public AbstractMetadataManager {
 
 };
 

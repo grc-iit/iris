@@ -6,7 +6,9 @@
 #define IRIS_POSIXMETADATAMANAGER_H
 
 
-class POSIXMetadataManager {
+#include "AbstractMetadataManager.h"
+
+class POSIXMetadataManager: public AbstractMetadataManager {
 
 };
 
