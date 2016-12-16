@@ -24,6 +24,14 @@
 #include "metadata_manager/IrisMetadataManager.h"
 #include "mapper/POSIXMapper.h"
 #include "mapper/MapperFactory.h"
+#include "mapper/S3Mapper.h"
+#include "mapper/MPIIOMapper.h"
+#include "mapper/HDF5Mapper.h"
+#include "mapper/PNETCDFMapper.h"
+#include "metadata_manager/MPIIOMetadataManager.h"
+#include "metadata_manager/HDF5MetadataManager.h"
+#include "metadata_manager/PNETCDFMetadataManager.h"
+#include "metadata_manager/S3MetadataManager.h"
 /******************************************************************************
 *Initializing various library components
 ******************************************************************************/
@@ -39,7 +47,27 @@ static IrisMetadataManager* irisMetadataManager = (IrisMetadataManager*)
 static POSIXMetadataManager* posixMetadataManager = (POSIXMetadataManager*)
     MetadataManagerFactory::getInstance()->getMetadataManager
         (POSIX_METADATA_MANAGER);
+static MPIIOMetadataManager* mpiioMetadataManager = (MPIIOMetadataManager*)
+    MetadataManagerFactory::getInstance()->getMetadataManager
+        (MPIIO_METADATA_MANAGER);
+static HDF5MetadataManager* hdf5MetadataManager = (HDF5MetadataManager*)
+    MetadataManagerFactory::getInstance()->getMetadataManager
+        (HDF5_METADATA_MANAGER);
+static PNETCDFMetadataManager* pnetcdfMetadataManager = (PNETCDFMetadataManager*)
+    MetadataManagerFactory::getInstance()->getMetadataManager
+        (PNETCDF_METADATA_MANAGER);
+static S3MetadataManager* s3MetadataManager = (S3MetadataManager*)
+    MetadataManagerFactory::getInstance()->getMetadataManager
+        (S3_METADATA_MANAGER);
 /* Mappers*/
 static POSIXMapper* posixMapper = (POSIXMapper*) MapperFactory::getInstance()
     ->getMapper(POSIX_MAPPER);
+static MPIIOMapper* mpiioMapper = (MPIIOMapper*) MapperFactory::getInstance()
+    ->getMapper(MPIIO_MAPPER);
+static HDF5Mapper* hdf5Mapper = (HDF5Mapper*) MapperFactory::getInstance()
+    ->getMapper(HDF5_MAPPER);
+static PNETCDFMapper* pnetcdfMapper = (PNETCDFMapper*)
+    MapperFactory::getInstance()->getMapper(PNETCDF_MAPPER);
+static S3Mapper* s3Mapper = (S3Mapper*) MapperFactory::getInstance()
+    ->getMapper(S3_MAPPER);
 #endif //IRIS_ABSTRACTAPI_H
