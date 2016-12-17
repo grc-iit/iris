@@ -1,6 +1,7 @@
 /******************************************************************************
 *include files
 ******************************************************************************/
+#include <bits/unique_ptr.h>
 #include "PrefetcherFactory.h"
 #include "../Constants.h"
 #include "FileSystemPrefetcher.h"
@@ -16,14 +17,14 @@ PrefetcherFactory::~PrefetcherFactory() {}
 /******************************************************************************
 *Gettters and setters
 ******************************************************************************/
-PrefetcherFactory *PrefetcherFactory::getInstance() {
+std::unique_ptr<PrefetcherFactory> PrefetcherFactory::getInstance() {
   if(instance== nullptr){
     instance=new PrefetcherFactory();
   }
   return instance;
 }
-AbstractPrefetcher* PrefetcherFactory::getPrefetcher(const char *name) {
-  AbstractPrefetcher* prefetcherInstance= nullptr;
+std::unique_ptr<AbstractPrefetcher> PrefetcherFactory::getPrefetcher(const char *name) {
+  std::unique_ptr<AbstractPrefetcher> prefetcherInstance= nullptr;
   if(name == FILESYSTEM_PREFETCHER){
     prefetcherInstance=new FileSystemPrefetcher();
   }

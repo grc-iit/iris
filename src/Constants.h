@@ -33,4 +33,12 @@
 #define PNETCDF_MAPPER "PNETCDF_MAPPER"
 #define S3_MAPPER "S3_MAPPER"
 
+struct Key{
+    std::string name;
+    size_t offset;
+    size_t size;
+};
+
+#define MAX_FILENAME_LENGTH 256
+#define FILE_BUFFER_CAPACITY 1
 #endif //IRIS_CONSTANTS_H

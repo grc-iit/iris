@@ -1,0 +1,4 @@
+1) metadata managers inherit iris metadata instead of the abstract. (remove abstract_metadata_manager)
+2) change all raw pointers to std::unique_ptr
+3) fix all API class initialization stuff
+4) code the rest of the POSIX

@@ -28,14 +28,14 @@ private:
 /******************************************************************************
 *Private members
 ******************************************************************************/
-  static PrefetcherFactory* instance;
+  static std::unique_ptr<PrefetcherFactory> instance;
 
 public:
 /******************************************************************************
 *Gettters and setters
 ******************************************************************************/
-  static PrefetcherFactory* getInstance();
-  AbstractPrefetcher* getPrefetcher(const char* name);
+  static std::unique_ptr<PrefetcherFactory> getInstance();
+  std::unique_ptr<AbstractPrefetcher> getPrefetcher(const char* name);
 };
 
 

@@ -15,16 +15,16 @@
 MetadataManagerFactory::MetadataManagerFactory() {}
 MetadataManagerFactory::~MetadataManagerFactory() {}
 
-MetadataManagerFactory *MetadataManagerFactory::getInstance() {
+std::unique_ptr<MetadataManagerFactory> MetadataManagerFactory::getInstance() {
   if(instance == nullptr){
     instance = new MetadataManagerFactory();
   }
   return instance;
 }
 
-AbstractMetadataManager *
+std::unique_ptr<AbstractMetadataManager>
 MetadataManagerFactory::getMetadataManager(const char *name) {
-  AbstractMetadataManager* metadataManagerInstance = nullptr;
+  std::unique_ptr<AbstractMetadataManager> metadataManagerInstance = nullptr;
   if(name == IRIS_METADATA_MANAGER){
     metadataManagerInstance = new IrisMetadataManager();
   }

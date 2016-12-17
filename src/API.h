@@ -13,6 +13,7 @@
 /******************************************************************************
 *include files
 ******************************************************************************/
+#include <memory>
 #include "utils/AbstractPrefetcher.h"
 #include "utils/PrefetcherFactory.h"
 #include "Constants.h"
@@ -32,6 +33,35 @@
 #include "metadata_manager/HDF5MetadataManager.h"
 #include "metadata_manager/PNETCDFMetadataManager.h"
 #include "metadata_manager/S3MetadataManager.h"
+
+
+class API{
+private:
+    static API* instance;
+    /*Cache Manager*/
+    CacheManager* cacheManager;
+    std::unique_ptr<ObjectStorePrefetcher> objectStorePrefetcherInstance;
+    std::unique_ptr<MetadataManagerFactory> metadataManagerFactory;
+    API(){
+        cacheManager=CacheManager::getInstance();
+        objectStorePrefetcherInstance = (ObjectStorePrefetcher*)PrefetcherFactory::getInstance()->getPrefetcher(OBJECTSTORE_PREFETCHER);
+        metadataManagerFactory=MetadataManagerFactory::getInstance();
+    }
+public:
+    static API* getInstance();
+
+    CacheManager *getCacheManager();
+
+    const std::unique_ptr<ObjectStorePrefetcher> &getObjectStorePrefetcherInstance() const {
+        return objectStorePrefetcherInstance;
+    }
+    const std::unique_ptr<MetadataManagerFactory> &getMetadataManagerFactory() const {
+        return metadataManagerFactory;
+    }
+
+    virtual ~API() {}
+};
+
 /******************************************************************************
 *Initializing various library components
 ******************************************************************************/
