@@ -6,9 +6,9 @@
 #define IRIS_HDF5METADATAMANAGER_H
 
 
-#include "AbstractMetadataManager.h"
+#include "IrisMetadataManager.h"
 
-class HDF5MetadataManager: public AbstractMetadataManager {
+class HDF5MetadataManager: public IrisMetadataManager {
 
 };
 

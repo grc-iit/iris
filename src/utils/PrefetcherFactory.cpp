@@ -3,7 +3,7 @@
 ******************************************************************************/
 #include <bits/unique_ptr.h>
 #include "PrefetcherFactory.h"
-#include "../Constants.h"
+#include "../constants.h"
 #include "FileSystemPrefetcher.h"
 #include "ObjectStorePrefetcher.h"
 /******************************************************************************

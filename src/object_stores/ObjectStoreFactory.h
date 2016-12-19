@@ -19,7 +19,6 @@ private:
 
 public:
     static std::unique_ptr<ObjectStoreFactory> getInstance();
-
     std::unique_ptr<AbstractObjectStore> getObjectStore(std::string name);
 };
 

@@ -5,18 +5,19 @@
 #ifndef IRIS_METADATAMANAGERFACTORY_H
 #define IRIS_METADATAMANAGERFACTORY_H
 
-#include <bits/unique_ptr.h>
-#include "AbstractMetadataManager.h"
+#include <memory>
+#include "IrisMetadataManager.h"
 
 class MetadataManagerFactory {
 private:
   static std::unique_ptr<MetadataManagerFactory> instance;
   MetadataManagerFactory();
-  virtual ~MetadataManagerFactory();
+
 
 public:
   static std::unique_ptr<MetadataManagerFactory> getInstance();
-  std::unique_ptr<AbstractMetadataManager> getMetadataManager(const char* name);
+  std::unique_ptr<IrisMetadataManager> getMetadataManager(const char* name);
+  virtual ~MetadataManagerFactory();
 };
 
 

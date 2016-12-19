@@ -4,9 +4,17 @@
 
 #include "CacheManager.h"
 
-CacheManager *CacheManager::getInstance() {
-    if(instance== nullptr){
-        instance=new CacheManager();
-    }
-    return instance;
+std::unique_ptr<CacheManager> CacheManager::getInstance() {
+  if(instance== nullptr){
+    instance=new CacheManager();
+  }
+  return instance;
 }
+
+std::vector<Key>
+CacheManager::isCached(std::vector<Key> &keys) {
+  std::vector<Key> cachedKeys;
+  return cachedKeys;
+}
+
+

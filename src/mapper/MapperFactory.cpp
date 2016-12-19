@@ -2,7 +2,7 @@
 *include files
 ******************************************************************************/
 #include "MapperFactory.h"
-#include "../Constants.h"
+#include "../constants.h"
 #include "POSIXMapper.h"
 #include "MPIIOMapper.h"
 #include "HDF5Mapper.h"
@@ -20,14 +20,14 @@ MapperFactory::~MapperFactory() {}
 /******************************************************************************
 *Gettters and setters
 ******************************************************************************/
-MapperFactory *MapperFactory::getInstance() {
+std::unique_ptr<MapperFactory> MapperFactory::getInstance() {
   if(instance== nullptr){
     instance=new MapperFactory();
   }
   return instance;
 }
-AbstractMapper *MapperFactory::getMapper(const char *name) {
-  AbstractMapper* mapperInstance = nullptr;
+std::unique_ptr<AbstractMapper> MapperFactory::getMapper(const char *name) {
+  std::unique_ptr<AbstractMapper> mapperInstance = nullptr;
   if(name == POSIX_MAPPER){
     mapperInstance = new POSIXMapper();
   }

@@ -16,7 +16,7 @@
 #include <memory>
 #include "utils/AbstractPrefetcher.h"
 #include "utils/PrefetcherFactory.h"
-#include "Constants.h"
+#include "constants.h"
 #include "utils/CacheManager.h"
 #include "utils/ObjectStorePrefetcher.h"
 #include "utils/FileSystemPrefetcher.h"
@@ -33,71 +33,46 @@
 #include "metadata_manager/HDF5MetadataManager.h"
 #include "metadata_manager/PNETCDFMetadataManager.h"
 #include "metadata_manager/S3MetadataManager.h"
-
-
+/******************************************************************************
+*Class
+******************************************************************************/
 class API{
 private:
-    static API* instance;
-    /*Cache Manager*/
-    CacheManager* cacheManager;
-    std::unique_ptr<ObjectStorePrefetcher> objectStorePrefetcherInstance;
-    std::unique_ptr<MetadataManagerFactory> metadataManagerFactory;
-    API(){
-        cacheManager=CacheManager::getInstance();
-        objectStorePrefetcherInstance = (ObjectStorePrefetcher*)PrefetcherFactory::getInstance()->getPrefetcher(OBJECTSTORE_PREFETCHER);
-        metadataManagerFactory=MetadataManagerFactory::getInstance();
-    }
+/******************************************************************************
+*Variables and members
+******************************************************************************/
+  static std::unique_ptr<API> instance;
+  std::unique_ptr<CacheManager> cacheManager;
+  std::unique_ptr<PrefetcherFactory> prefetcherFactory;
+  std::unique_ptr<MetadataManagerFactory> metadataManagerFactory;
+  std::unique_ptr<MapperFactory> mapperFactory;
+/******************************************************************************
+*Constructor
+******************************************************************************/
+  API();
 public:
-    static API* getInstance();
+/******************************************************************************
+*Getters and setters
+******************************************************************************/
+  static std::unique_ptr<API> getInstance();
 
-    CacheManager *getCacheManager();
+  std::unique_ptr<CacheManager> getCacheManager() {
+    return cacheManager;
+  }
 
-    const std::unique_ptr<ObjectStorePrefetcher> &getObjectStorePrefetcherInstance() const {
-        return objectStorePrefetcherInstance;
-    }
-    const std::unique_ptr<MetadataManagerFactory> &getMetadataManagerFactory() const {
-        return metadataManagerFactory;
-    }
-
-    virtual ~API() {}
+  std::unique_ptr<PrefetcherFactory> getPrefetcherFactory() {
+    return prefetcherFactory;
+  }
+  std::unique_ptr<MetadataManagerFactory> getMetadataManagerFactory() {
+    return metadataManagerFactory;
+  }
+  std::unique_ptr<MapperFactory> getMapperFactory() {
+    return mapperFactory;
+  }
+/******************************************************************************
+*Destructor
+******************************************************************************/
+  virtual ~API() {}
 };
 
-/******************************************************************************
-*Initializing various library components
-******************************************************************************/
-/*Cache Manager*/
-static CacheManager* cacheManager=CacheManager::getInstance();
-/*Prefetchers*/
-static ObjectStorePrefetcher* objectStorePrefetcherInstance=(ObjectStorePrefetcher*)PrefetcherFactory::getInstance()->getPrefetcher(OBJECTSTORE_PREFETCHER);
-static FileSystemPrefetcher* fileSystemPrefetcherInstance=(FileSystemPrefetcher*)PrefetcherFactory::getInstance()->getPrefetcher(FILESYSTEM_PREFETCHER);
-/*Metadata Managers*/
-static IrisMetadataManager* irisMetadataManager = (IrisMetadataManager*)
-    MetadataManagerFactory::getInstance()->getMetadataManager
-        (IRIS_METADATA_MANAGER);
-static POSIXMetadataManager* posixMetadataManager = (POSIXMetadataManager*)
-    MetadataManagerFactory::getInstance()->getMetadataManager
-        (POSIX_METADATA_MANAGER);
-static MPIIOMetadataManager* mpiioMetadataManager = (MPIIOMetadataManager*)
-    MetadataManagerFactory::getInstance()->getMetadataManager
-        (MPIIO_METADATA_MANAGER);
-static HDF5MetadataManager* hdf5MetadataManager = (HDF5MetadataManager*)
-    MetadataManagerFactory::getInstance()->getMetadataManager
-        (HDF5_METADATA_MANAGER);
-static PNETCDFMetadataManager* pnetcdfMetadataManager = (PNETCDFMetadataManager*)
-    MetadataManagerFactory::getInstance()->getMetadataManager
-        (PNETCDF_METADATA_MANAGER);
-static S3MetadataManager* s3MetadataManager = (S3MetadataManager*)
-    MetadataManagerFactory::getInstance()->getMetadataManager
-        (S3_METADATA_MANAGER);
-/* Mappers*/
-static POSIXMapper* posixMapper = (POSIXMapper*) MapperFactory::getInstance()
-    ->getMapper(POSIX_MAPPER);
-static MPIIOMapper* mpiioMapper = (MPIIOMapper*) MapperFactory::getInstance()
-    ->getMapper(MPIIO_MAPPER);
-static HDF5Mapper* hdf5Mapper = (HDF5Mapper*) MapperFactory::getInstance()
-    ->getMapper(HDF5_MAPPER);
-static PNETCDFMapper* pnetcdfMapper = (PNETCDFMapper*)
-    MapperFactory::getInstance()->getMapper(PNETCDF_MAPPER);
-static S3Mapper* s3Mapper = (S3Mapper*) MapperFactory::getInstance()
-    ->getMapper(S3_MAPPER);
 #endif //IRIS_ABSTRACTAPI_H
