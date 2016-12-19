@@ -3,6 +3,7 @@
 ******************************************************************************/
 #include <cstring>
 #include "POSIX.h"
+#include "object_stores/HyperdexClient.h"
 /******************************************************************************
 *Interface operations
 ******************************************************************************/
@@ -84,16 +85,19 @@ size_t fread(void *ptr, size_t size, size_t count, FILE *stream) {
   std::unique_ptr<POSIXMapper> posixMapper = (POSIXMapper*)apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER);
   std::unique_ptr<CacheManager> cacheManager = apiInstance->getCacheManager();
   std::unique_ptr<ObjectStorePrefetcher> objectStorePrefetcher = (ObjectStorePrefetcher*)apiInstance->getPrefetcherFactory()->getPrefetcher(OBJECTSTORE_PREFETCHER);
-
+  std::unique_ptr<HyperdexClient> hyperdexClient=(HyperdexClient*)apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT);
 
   std::size_t operationSize = size*count;
   const char * filename = posixMetadataManager->getFilename(stream);
   size_t fileOffset = posixMetadataManager->getFpPosition(stream);
   std::vector<Key> getKeys = posixMapper->generateKeys(filename, fileOffset,
                                                     operationSize);
+  //FIXME: IF we mutate the keys list how will we know the order of the keys?
   std::vector<Key> cachedKeys = cacheManager->isCached(getKeys);
   objectStorePrefetcher->fetchKeys(getKeys);
-  pass keys to ObjectStoreGetter
+  std::vector<void*> datas;
+  hyperdexClient->gets(getKeys,datas);
+
 
 
 

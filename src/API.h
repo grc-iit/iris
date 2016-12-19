@@ -33,46 +33,58 @@
 #include "metadata_manager/HDF5MetadataManager.h"
 #include "metadata_manager/PNETCDFMetadataManager.h"
 #include "metadata_manager/S3MetadataManager.h"
+#include "object_stores/ObjectStoreFactory.h"
+
 /******************************************************************************
 *Class
 ******************************************************************************/
-class API{
+class API {
 private:
 /******************************************************************************
 *Variables and members
 ******************************************************************************/
-  static std::unique_ptr<API> instance;
-  std::unique_ptr<CacheManager> cacheManager;
-  std::unique_ptr<PrefetcherFactory> prefetcherFactory;
-  std::unique_ptr<MetadataManagerFactory> metadataManagerFactory;
-  std::unique_ptr<MapperFactory> mapperFactory;
+    static std::unique_ptr<API> instance;
+    std::unique_ptr<CacheManager> cacheManager;
+    std::unique_ptr<PrefetcherFactory> prefetcherFactory;
+    std::unique_ptr<MetadataManagerFactory> metadataManagerFactory;
+    std::unique_ptr<MapperFactory> mapperFactory;
+    std::unique_ptr<ObjectStoreFactory> objectStoreFactory;
+
 /******************************************************************************
 *Constructor
 ******************************************************************************/
-  API();
+    API();
+
 public:
 /******************************************************************************
 *Getters and setters
 ******************************************************************************/
-  static std::unique_ptr<API> getInstance();
+    static std::unique_ptr<API> getInstance();
 
-  std::unique_ptr<CacheManager> getCacheManager() {
-    return cacheManager;
-  }
+    std::unique_ptr<CacheManager> getCacheManager() {
+        return cacheManager;
+    }
 
-  std::unique_ptr<PrefetcherFactory> getPrefetcherFactory() {
-    return prefetcherFactory;
-  }
-  std::unique_ptr<MetadataManagerFactory> getMetadataManagerFactory() {
-    return metadataManagerFactory;
-  }
-  std::unique_ptr<MapperFactory> getMapperFactory() {
-    return mapperFactory;
-  }
+    std::unique_ptr<PrefetcherFactory> getPrefetcherFactory() {
+        return prefetcherFactory;
+    }
+
+    std::unique_ptr<MetadataManagerFactory> getMetadataManagerFactory() {
+        return metadataManagerFactory;
+    }
+
+    std::unique_ptr<MapperFactory> getMapperFactory() {
+        return mapperFactory;
+    }
+
+    std::unique_ptr<ObjectStoreFactory> getObjectStoreFactory() {
+        return objectStoreFactory;
+    }
+
 /******************************************************************************
 *Destructor
 ******************************************************************************/
-  virtual ~API() {}
+    virtual ~API() {}
 };
 
 #endif //IRIS_ABSTRACTAPI_H

@@ -7,6 +7,7 @@
 
 
 #include <memory>
+#include <vector>
 #include "AbstractObjectStore.h"
 
 class HyperdexClient : public AbstractObjectStore {
@@ -24,6 +25,8 @@ public:
     int put(Key key, void *data) override;
 
     int remove(Key key) override;
+
+    int gets(std::vector<Key> key, std::vector<void*> &data);
 };
 
 
