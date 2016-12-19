@@ -18,7 +18,7 @@ POSIXMapper::generateKeys(const char * name, size_t offset, size_t size) {
   while(remainingOperationSize!=0) {
     sprintf(key.name, "%s_%ld", name, (base_key + i));
     if (offset == ((base_key + i) * MAX_OBJ_SIZE)) {
-      key.offset = offset;
+      key.offset = 0;
       if (remainingOperationSize < MAX_OBJ_SIZE) {
         key.size = remainingOperationSize;
         remainingOperationSize =0;
@@ -28,7 +28,7 @@ POSIXMapper::generateKeys(const char * name, size_t offset, size_t size) {
       }
       offset+=key.size;
     }else{
-      key.offset = offset;
+      key.offset = offset-((base_key + i) * MAX_OBJ_SIZE);
       key.size = ((base_key + i+1)* MAX_OBJ_SIZE)-offset;
       remainingOperationSize-=key.size;
       offset+=key.size;
