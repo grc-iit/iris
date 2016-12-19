@@ -6,8 +6,15 @@
 #define IRIS_ABSTRACTOBJECTSTORE_H
 
 
-class AbstractObjectStore {
+#include "../Constants.h"
 
+class AbstractObjectStore {
+public:
+    virtual int get(Key key, void *&data)= 0;
+
+    virtual int put(Key key, void *data)= 0;
+
+    virtual int remove(Key key)= 0;
 };
 
 

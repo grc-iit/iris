@@ -32,6 +32,10 @@
 #define HDF5_MAPPER "HDF5_MAPPER"
 #define PNETCDF_MAPPER "PNETCDF_MAPPER"
 #define S3_MAPPER "S3_MAPPER"
+/******************************************************************************
+*Object Stores
+******************************************************************************/
+#define HYPERDEX_CLIENT "HYPERDEX_CLIENT"
 
 struct Key{
     std::string name;

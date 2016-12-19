@@ -6,8 +6,21 @@
 #define IRIS_OBJECTSTOREFACTORY_H
 
 
-class ObjectStoreFactory {
+#include <memory>
+#include "AbstractObjectStore.h"
 
+class ObjectStoreFactory {
+private:
+    static std::unique_ptr<ObjectStoreFactory> instance;
+
+    ObjectStoreFactory() {
+
+    }
+
+public:
+    static std::unique_ptr<ObjectStoreFactory> getInstance();
+
+    std::unique_ptr<AbstractObjectStore> getObjectStore(std::string name);
 };
 
 
