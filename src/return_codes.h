@@ -5,11 +5,17 @@
 #ifndef IRIS_RETURN_CODES_H
 #define IRIS_RETURN_CODES_H
 
-typedef enum {
-    METADATA_CREATED_SUCCESS                = 1001,
-    METADATA_CREATED_FAIL                   = 1002
+typedef enum iris_returncode{
+  OPERATION_SUCCESSUL                = 7777,
 
-} return_codes;
+  /* Error codes*/
+  METADATA_CREATION_FAILED           = 7800,
+  ON_OPEN_METADATA_UPDATE_FAILED     = 7801,
+  ON_CLOSE_METADATA_UPDATE_FAILED    = 7802,
+  UPDATE_FILE_POINTER_FAILED         = 7803,
+  FP_NOT_EXIST                       = 7804,
+
+};
 
 
 #endif //IRIS_RETURN_CODES_H

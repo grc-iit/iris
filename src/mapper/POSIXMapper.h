@@ -6,10 +6,16 @@
 #define IRIS_POSIXMAPPER_H
 
 
+#include <vector>
+#include <cstdio>
 #include "AbstractMapper.h"
+#include "../constants.h"
 
 class POSIXMapper: public AbstractMapper {
+private:
 
+public:
+  std::vector<Key> generateKeys(const char * name, size_t offset, size_t size);
 };
 
 

@@ -10,6 +10,8 @@
 ******************************************************************************/
 #ifndef IRIS_CONSTANTS_H
 #define IRIS_CONSTANTS_H
+
+#include "return_codes.h"
 /******************************************************************************
 *Prefetcher
 ******************************************************************************/
@@ -32,13 +34,24 @@
 #define HDF5_MAPPER "HDF5_MAPPER"
 #define PNETCDF_MAPPER "PNETCDF_MAPPER"
 #define S3_MAPPER "S3_MAPPER"
-
+/******************************************************************************
+*Key structure
+******************************************************************************/
 struct Key{
-    std::string name;
+    char * name;
     size_t offset;
     size_t size;
+    void* data;
 };
-
+/******************************************************************************
+*Iris library parameters
+******************************************************************************/
 #define MAX_FILENAME_LENGTH 256
 #define FILE_BUFFER_CAPACITY 1
+#define POSIX_MODE "STRICT" // "RELAXED"
+#define MAX_KEY_LENGTH 32
+#define MAX_OBJ_SIZE 20
+
+
+
 #endif //IRIS_CONSTANTS_H

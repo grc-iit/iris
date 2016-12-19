@@ -1,16 +1,26 @@
-
 #include "API.h"
-
-static API *API::getInstance() {
-    if(instance== nullptr){
-        instance=new API();
-    }
-    return instance;
+/******************************************************************************
+*Constructor
+******************************************************************************/
+API::API() {
+  cacheManager = CacheManager::getInstance();
+  prefetcherFactory = PrefetcherFactory::getInstance();
+  metadataManagerFactory = MetadataManagerFactory::getInstance();
+  mapperFactory = MapperFactory::getInstance();
+}
+/******************************************************************************
+*Getters and setters
+******************************************************************************/
+static std::unique_ptr<API> API::getInstance() {
+  if(instance== nullptr){
+    instance=new API();
+  }
+  return instance;
 }
 
-CacheManager *API::getCacheManager() {
-    return cacheManager;
-}
+
+
+
 
 
 

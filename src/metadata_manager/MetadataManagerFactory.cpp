@@ -3,9 +3,8 @@
 //
 
 #include "MetadataManagerFactory.h"
-#include "../Constants.h"
+#include "../constants.h"
 #include "POSIXMetadataManager.h"
-#include "IrisMetadataManager.h"
 #include "MPIIOMetadataManager.h"
 #include "HDF5MetadataManager.h"
 #include "PNETCDFMetadataManager.h"
@@ -22,9 +21,9 @@ std::unique_ptr<MetadataManagerFactory> MetadataManagerFactory::getInstance() {
   return instance;
 }
 
-std::unique_ptr<AbstractMetadataManager>
+std::unique_ptr<IrisMetadataManager>
 MetadataManagerFactory::getMetadataManager(const char *name) {
-  std::unique_ptr<AbstractMetadataManager> metadataManagerInstance = nullptr;
+  std::unique_ptr<IrisMetadataManager> metadataManagerInstance = nullptr;
   if(name == IRIS_METADATA_MANAGER){
     metadataManagerInstance = new IrisMetadataManager();
   }

@@ -1,16 +1,17 @@
-#include <iostream>
+
+#include "/usr/include/mpich/mpi.h"
 
 int main() {
-    MPI_Init();
-    FILE * fh = fopen("hari", "w+");
-    fread();
-    doBenchmark(1);
+  MPI_Init();
 
+  MPI_Wtime();
+  doBenchmark(CM1);
+  MPI_Wtime();
 
-    std::cout << "Hello, World!" << std::endl;
+  MPI_Wtime();
+  doBenchmark(WRF);
+  MPI_Wtime();
 
-
-
-    MPI_Finalize();
-    return 0;
+  MPI_Finalize();
+  return 0;
 }
