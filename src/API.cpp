@@ -7,6 +7,7 @@ API::API() {
   prefetcherFactory = PrefetcherFactory::getInstance();
   metadataManagerFactory = MetadataManagerFactory::getInstance();
   mapperFactory = MapperFactory::getInstance();
+  objectStoreFactory=ObjectStoreFactory::getInstance();
 }
 /******************************************************************************
 *Getters and setters
