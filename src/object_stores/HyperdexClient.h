@@ -9,24 +9,25 @@
 #include <memory>
 #include <vector>
 #include "AbstractObjectStore.h"
+#include "../constants.h"
 
 class HyperdexClient : public AbstractObjectStore {
-    static std::unique_ptr<HyperdexClient> instance;
-
-    HyperdexClient() {
-
-    }
+private:
+  static std::unique_ptr<HyperdexClient> instance;
+  HyperdexClient();
 
 public:
-    static std::unique_ptr<HyperdexClient> getInstance();
+  static std::unique_ptr<HyperdexClient> getInstance();
 
-    int get(Key key, void *&data) override;
+  int get(Key key, void *&data) override;
 
-    int put(Key key, void *data) override;
+  int put(Key key, void *data) override;
 
-    int remove(Key key) override;
+  int remove(Key key) override;
 
-    int gets(std::vector<Key> key, std::vector<void*> &data);
+  int gets(std::vector<Key> key, std::vector<void*> &data);
+
+  virtual ~HyperdexClient();
 };
 
 
