@@ -81,9 +81,11 @@ size_t fread(void *ptr, size_t size, size_t count, FILE *stream) {
   std::unique_ptr<POSIXMetadataManager> posixMetadataManager =
       (POSIXMetadataManager*)apiInstance->getMetadataManagerFactory()->
           getMetadataManager(POSIX_METADATA_MANAGER);
-  std::unique_ptr<POSIXMapper> posixMapper = (POSIXMapper*)apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER);
+  std::unique_ptr<POSIXMapper> posixMapper =
+      (POSIXMapper*)apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER);
   std::unique_ptr<CacheManager> cacheManager = apiInstance->getCacheManager();
-  std::unique_ptr<ObjectStorePrefetcher> objectStorePrefetcher = (ObjectStorePrefetcher*)apiInstance->getPrefetcherFactory()->getPrefetcher(OBJECTSTORE_PREFETCHER);
+  std::unique_ptr<ObjectStorePrefetcher> objectStorePrefetcher =
+      (ObjectStorePrefetcher*)apiInstance->getPrefetcherFactory()->getPrefetcher(OBJECTSTORE_PREFETCHER);
 
 
   std::size_t operationSize = size*count;
