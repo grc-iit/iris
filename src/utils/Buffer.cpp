@@ -5,12 +5,12 @@
 /******************************************************************************
 *Constructors
 ******************************************************************************/
-inline Buffer::Buffer(void *data)
+Buffer::Buffer(void *data)
 {
   if(data != nullptr) data_ = (char *) data;
 }
 
-inline Buffer::Buffer(size_type s)
+Buffer::Buffer(size_type s)
     :free_(true)
 {
   if(s != 0) data_ = new char[s];
@@ -18,7 +18,7 @@ inline Buffer::Buffer(size_type s)
   size_ = capacity_ = s;
 }
 
-inline Buffer::Buffer(size_type s, size_type c)
+Buffer::Buffer(size_type s, size_type c)
     : free_(true)
 {
   if(s > c)
@@ -30,7 +30,7 @@ inline Buffer::Buffer(size_type s, size_type c)
   capacity_ = c;
 }
 
-inline Buffer::Buffer(const void* d, size_type s)
+Buffer::Buffer(const void* d, size_type s)
     : free_(true)
 {
   if(s != 0)
@@ -42,7 +42,7 @@ inline Buffer::Buffer(const void* d, size_type s)
   size_ = capacity_ = s;
 }
 
-inline Buffer::Buffer(const void* d, size_type s, size_type c)
+Buffer::Buffer(const void* d, size_type s, size_type c)
     : free_(true)
 {
   if(s > c)
@@ -60,14 +60,14 @@ inline Buffer::Buffer(const void* d, size_type s, size_type c)
   capacity_ = c;
 }
 
-inline Buffer::Buffer(void* d, size_type s, size_type c, bool own)
+Buffer::Buffer(void* d, size_type s, size_type c, bool own)
     : data_(static_cast<char*> (d)), size_(s), capacity_(c), free_(own)
 {
   if(s > c)
     throw std::invalid_argument("size greater than capacity");
 }
 
-inline Buffer::Buffer(const Buffer& x)
+Buffer::Buffer(const Buffer& x)
     : free_(true)
 {
   if(x.capacity_ != 0)
@@ -84,7 +84,7 @@ inline Buffer::Buffer(const Buffer& x)
 /******************************************************************************
 *Destructor
 ******************************************************************************/
-inline Buffer::~Buffer()
+Buffer::~Buffer()
 {
   if(free_)
     delete[] data_;
@@ -92,7 +92,7 @@ inline Buffer::~Buffer()
 /******************************************************************************
 *Interface
 ******************************************************************************/
-inline Buffer& Buffer::operator= (const Buffer& x)
+Buffer& Buffer::operator= (const Buffer& x)
 {
   if(&x != this)
   {
@@ -109,7 +109,7 @@ inline Buffer& Buffer::operator= (const Buffer& x)
   return *this;
 }
 
-inline void Buffer::swap(Buffer& x)
+void Buffer::swap(Buffer& x)
 {
   char* d(x.data_);
   size_type s(x.size_);
@@ -127,7 +127,7 @@ inline void Buffer::swap(Buffer& x)
   free_ = f;
 }
 
-inline char* Buffer::detach()
+char* Buffer::detach()
 {
   char* r(data_);
   data_ = 0;
@@ -137,7 +137,7 @@ inline char* Buffer::detach()
   return r;
 }
 
-inline void Buffer::assign(const void* d, size_type s)
+void Buffer::assign(const void* d, size_type s)
 {
   if(s > capacity_)
   {
@@ -150,7 +150,7 @@ inline void Buffer::assign(const void* d, size_type s)
   size_ = s;
 }
 
-inline void Buffer::assign(void* d, size_type s, size_type c, bool own)
+void Buffer::assign(void* d, size_type s, size_type c, bool own)
 {
   if(free_) delete[] data_;
   data_ = static_cast<char*>(d);
@@ -159,12 +159,12 @@ inline void Buffer::assign(void* d, size_type s, size_type c, bool own)
   free_ = own;
 }
 
-inline void Buffer::append(const Buffer& b)
+void Buffer::append(const Buffer& b)
 {
   append(b.data(), b.size());
 }
 
-inline void Buffer::append(const void* d, size_type s)
+void Buffer::append(const void* d, size_type s)
 {
   if(s != 0)
   {
@@ -177,17 +177,17 @@ inline void Buffer::append(const void* d, size_type s)
   }
 }
 
-inline void Buffer::fill(char v)
+void Buffer::fill(char v)
 {
   if(size_ > 0) std::memset(data_, v, size_);
 }
 
-inline Buffer::size_type Buffer::size() const
+Buffer::size_type Buffer::size() const
 {
   return size_;
 }
 
-inline bool Buffer::size(size_type s)
+bool Buffer::size(size_type s)
 {
   bool r(false);
 
@@ -196,12 +196,12 @@ inline bool Buffer::size(size_type s)
   return r;
 }
 
-inline Buffer::size_type Buffer::capacity() const
+Buffer::size_type Buffer::capacity() const
 {
   return capacity_;
 }
 
-inline bool Buffer::capacity(size_type c)
+bool Buffer::capacity(size_type c)
 {
   // Ignore capacity decrease requests.
   //
@@ -219,37 +219,37 @@ inline bool Buffer::capacity(size_type c)
   return true;
 }
 
-inline bool Buffer::empty () const
+bool Buffer::empty () const
 {
   return size_ == 0;
 }
 
-inline void Buffer::clear ()
+void Buffer::clear ()
 {
   size_ = 0;
 }
 
-inline char* Buffer::data ()
+char* Buffer::data ()
 {
   return data_;
 }
 
-inline const char* Buffer::data () const
+const char* Buffer::data () const
 {
   return data_;
 }
 
-inline char& Buffer::operator[] (size_type i)
+char& Buffer::operator[] (size_type i)
 {
   return data_[i];
 }
 
-inline char Buffer::operator[] (size_type i) const
+char Buffer::operator[] (size_type i) const
 {
   return data_[i];
 }
 
-inline char& Buffer::at (size_type i)
+char& Buffer::at (size_type i)
 {
   if (i >= size_)
     throw std::out_of_range ("index out of range");
@@ -257,7 +257,7 @@ inline char& Buffer::at (size_type i)
   return data_[i];
 }
 
-inline char Buffer::at (size_type i) const
+char Buffer::at (size_type i) const
 {
   if (i >= size_)
     throw std::out_of_range ("index out of range");
@@ -265,7 +265,7 @@ inline char Buffer::at (size_type i) const
   return data_[i];
 }
 
-inline Buffer::size_type Buffer::find (char v, size_type pos) const
+Buffer::size_type Buffer::find (char v, size_type pos) const
 {
   if (size_ == 0 || pos >= size_)
     return npos;
@@ -274,7 +274,7 @@ inline Buffer::size_type Buffer::find (char v, size_type pos) const
   return p != 0 ? static_cast<size_type> (p - data_) : npos;
 }
 
-inline Buffer::size_type Buffer::rfind (char v, size_type pos) const
+Buffer::size_type Buffer::rfind (char v, size_type pos) const
 {
   // memrchr() is not standard.
   //
@@ -296,13 +296,13 @@ inline Buffer::size_type Buffer::rfind (char v, size_type pos) const
 /******************************************************************************
 *Operators
 ******************************************************************************/
-inline bool operator== (const Buffer& a, const Buffer& b)
+bool operator== (const Buffer& a, const Buffer& b)
 {
   return a.size () == b.size () &&
          std::memcmp (a.data (), b.data (), a.size ()) == 0;
 }
 
-inline bool operator!= (const Buffer& a, const Buffer& b)
+bool operator!= (const Buffer& a, const Buffer& b)
 {
   return !(a == b);
 }
