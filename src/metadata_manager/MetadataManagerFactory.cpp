@@ -9,7 +9,10 @@
 #include "HDF5MetadataManager.h"
 #include "PNETCDFMetadataManager.h"
 #include "S3MetadataManager.h"
-
+/******************************************************************************
+*Initialization of static
+******************************************************************************/
+std::shared_ptr<MetadataManagerFactory> MetadataManagerFactory::instance = nullptr;
 
 MetadataManagerFactory::MetadataManagerFactory() {}
 MetadataManagerFactory::~MetadataManagerFactory() {}

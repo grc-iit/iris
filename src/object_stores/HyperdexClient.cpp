@@ -7,6 +7,11 @@
 #include <hyperdex/client.h>
 #include <hyperdex/admin.h>
 
+/******************************************************************************
+*Initialization of static
+******************************************************************************/
+std::shared_ptr<HyperdexClient> HyperdexClient::instance = nullptr;
+
 HyperdexClient::HyperdexClient() {
   if(init() != OPERATION_SUCCESSUL){
     //TODO: throw exception here!

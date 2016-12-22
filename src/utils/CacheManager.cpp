@@ -3,6 +3,10 @@
 //
 
 #include "CacheManager.h"
+/******************************************************************************
+*Initialization of static
+******************************************************************************/
+std::shared_ptr<CacheManager> CacheManager::instance = nullptr;
 
 std::shared_ptr<CacheManager> CacheManager::getInstance() {
   if(instance== nullptr){

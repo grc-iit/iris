@@ -4,6 +4,10 @@
 
 #include "ObjectStoreFactory.h"
 #include "HyperdexClient.h"
+/******************************************************************************
+*Initialization of static
+******************************************************************************/
+std::shared_ptr<ObjectStoreFactory> ObjectStoreFactory::instance = nullptr;
 
 ObjectStoreFactory::ObjectStoreFactory() {}
 

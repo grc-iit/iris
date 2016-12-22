@@ -82,8 +82,5 @@ public:
     return objectStoreFactory;
   }
 };
-/******************************************************************************
-*Initialization of static
-******************************************************************************/
-std::shared_ptr<API> API::instance = nullptr;
+
 #endif //IRIS_ABSTRACTAPI_H
