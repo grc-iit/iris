@@ -92,6 +92,16 @@ Buffer::~Buffer()
 /******************************************************************************
 *Interface
 ******************************************************************************/
+void Buffer::update(const void *data, Buffer::size_type offset,
+                    Buffer::size_type size) {
+  if(offset+size <= size_){
+    char * index = reinterpret_cast<char*> (data_);
+    index+= offset;
+    std::memcpy (index, data, size);
+  }
+}
+
+
 Buffer& Buffer::operator= (const Buffer& x)
 {
   if(&x != this)
@@ -292,6 +302,8 @@ Buffer::size_type Buffer::rfind (char v, size_type pos) const
 
   return npos;
 }
+
+
 
 /******************************************************************************
 *Operators

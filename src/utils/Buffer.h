@@ -46,6 +46,8 @@ public:
 /******************************************************************************
 *Interface
 ******************************************************************************/
+  void update(const void * data, size_type offset, size_type size);
+
   Buffer &operator=(const Buffer &);
 
   void swap(Buffer &);

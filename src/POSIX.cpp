@@ -103,7 +103,7 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
     if(cacheManager->isCached(key) != OPERATION_SUCCESSUL){
       hyperdexClient->get(key);
     }
-    buffer.append((char*)key.data+key.offset,key.size);
+    buffer.update(key.data,key.offset,key.size);
   }
   objectStorePrefetcher->fetch(filename, fileOffset, operationSize);
   posixMetadataManager->updateMetadataOnRead(stream, operationSize);

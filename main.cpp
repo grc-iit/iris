@@ -1,3 +1,4 @@
+#include <iostream>
 #include "src/iris.h"
 
 
@@ -20,8 +21,8 @@ char *randstring(size_t length) {
 
 
 int main(int argc, char *args[]) {
-
-  char * write_buf;
+  std::cout << "Hello from main" << std::endl;
+  /*char * write_buf;
   size_t op_size = 2*MAX_OBJ_SIZE;
   write_buf = randstring(op_size);
   char * read_buf = (char *)malloc(FILE_BUFFER_CAPACITY);
@@ -32,7 +33,7 @@ int main(int argc, char *args[]) {
   fh = iris::fopen("file0.dat", "w");
   iris::fwrite(write_buf, 1, 100, fh);
   iris::fread(read_buf, 1, 100, fh);
-  iris::fclose(fh);
+  iris::fclose(fh);*/
 
   return 0;
 }
