@@ -11,6 +11,7 @@
 #ifndef IRIS_CONSTANTS_H
 #define IRIS_CONSTANTS_H
 
+#include <cstdio>
 #include "return_codes.h"
 /******************************************************************************
 *Prefetcher
@@ -44,8 +45,8 @@
 ******************************************************************************/
 struct Key{
     char * name;
-    size_t offset;
-    size_t size;
+    std::size_t offset;
+    std::size_t size;
     void* data;
 };
 /******************************************************************************
@@ -56,6 +57,12 @@ struct Key{
 #define POSIX_MODE "STRICT" // "RELAXED"
 #define MAX_KEY_LENGTH 32
 #define MAX_OBJ_SIZE 20
+//Hyperdex parameters
+#define SPACE "IRIS_KEYSPACE"
+#define DESCRIPTION "space IRIS_KEYSPACE key offset attributes data"
+#define COORDINATOR  "127.0.0.1"
+#define COORDINATOR_PORT 1982
+
 
 
 

@@ -12,13 +12,14 @@
 
 class CacheManager {
 private:
-    static std::unique_ptr<CacheManager> instance;
-    CacheManager(){
+  static std::unique_ptr<CacheManager> instance;
+  CacheManager(){
 
-    }
+  }
 public:
-    static std::unique_ptr<CacheManager> getInstance();
-    std::vector<Key> isCached(std::vector<Key> &keys);
+  static std::unique_ptr<CacheManager> getInstance();
+  int isCached(Key &key);
+  int cacheData(Key &key);
 };
 
 

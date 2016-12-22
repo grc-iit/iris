@@ -15,8 +15,11 @@ class POSIXMapper: public AbstractMapper {
 private:
 
 public:
-  std::vector<Key> generateKeys(const char * name, size_t offset, size_t size);
+  std::vector<Key> generateKeys(const char *name, size_t offset,
+                                size_t size);
 };
+
+
 
 
 #endif //IRIS_POSIXMAPPER_H

@@ -2,8 +2,9 @@
 *include files
 ******************************************************************************/
 #include <cstring>
+#include <algorithm>
 #include "POSIX.h"
-#include "object_stores/HyperdexClient.h"
+#include "utils/Buffer.h"
 /******************************************************************************
 *Interface operations
 ******************************************************************************/
@@ -85,127 +86,62 @@ std::size_t fread(void *ptr, std::size_t size, std::size_t count, FILE *stream) 
   std::unique_ptr<POSIXMapper> posixMapper =
       (POSIXMapper*)apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER);
   std::unique_ptr<CacheManager> cacheManager = apiInstance->getCacheManager();
-
   std::unique_ptr<ObjectStorePrefetcher> objectStorePrefetcher =
       (ObjectStorePrefetcher*)apiInstance->getPrefetcherFactory()->getPrefetcher(OBJECTSTORE_PREFETCHER);
-
   std::unique_ptr<HyperdexClient> hyperdexClient =
-  (HyperdexClient*)apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT);
-
+      (HyperdexClient*)apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT);
 
   std::size_t operationSize = size*count;
   const char * filename = posixMetadataManager->getFilename(stream);
   std::size_t fileOffset = posixMetadataManager->getFpPosition(stream);
-  std::vector<Key> getKeys = posixMapper->generateKeys(filename, fileOffset,
-                                                    operationSize);
-  //FIXME: IF we mutate the keys list how will we know the order of the keys?
-  // Correct, needs fixing!
-  std::vector<Key> cachedKeys = cacheManager->isCached(getKeys);
-  /*TODO:
-   * get the keys from KVS
-   * concatenate all keys
-   * prefetch the next batch of keys
-   * and update metadata. */
+  std::vector<Key> keys =
+      posixMapper->generateKeys(filename, fileOffset, operationSize);
 
-
-  objectStorePrefetcher->fetchKeys(getKeys);
-  std::vector<void*> datas;
-  hyperdexClient->gets(getKeys,datas);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /* Initializing things for the operation*/
-
-
-  std::size_t num_keys = ((op_size/MAX_OBJ_SIZE)+1);
-  char * concat_buf = (char *)malloc(op_size);
-  long int file_offset = 0, offset = 0, base_key = 0;
-  long int ptr_index = 0;
-
-
-  /*get the offset from the file pointer according to the stream*/
-  std::unordered_map<FILE *, long int>::const_iterator index =
-      pointer.find(stream);
-  if(index != pointer.end()){
-    file_offset = offset = index->second;
-    base_key = offset/MAX_OBJ_SIZE;
-  }
-
-  /* prepare HyperDex client structs*/
-  const struct hyperdex_client_attribute* attributes = 0;
-  std::size_t attributes_sz = 0;
-  enum hyperdex_client_returncode op_status, loop_status;
-  int64_t op_id, loop_id;//todo check if i need to initialize them
-
-  for(std::size_t i =0; i < num_keys; i++){
-    /* prepare the key */
-    sprintf(keys[i], "%ld", ((base_key+i)*MAX_OBJ_SIZE));
-    /*get the keys and copy data to temp buffer*/
-    op_id = hyperdex_client_get(kvs_client, space,
-                                keys[i], KEY_SIZE,
-                                &op_status,
-                                &attributes, &attributes_sz);
-    loop_id = hyperdex_client_loop(kvs_client, -1, &loop_status);
-    if (op_id == loop_id && loop_status == HYPERDEX_CLIENT_SUCCESS) {
-      if(offset == ((base_key+i)*MAX_OBJ_SIZE)){
-        if(op_size >= MAX_OBJ_SIZE){
-          sprintf(&concat_buf[ptr_index], "%.*s", (int)MAX_OBJ_SIZE,
-                  attributes->value);
-          op_size -= MAX_OBJ_SIZE;
-          ptr_index += MAX_OBJ_SIZE;
-          offset += MAX_OBJ_SIZE;
-        }
-        else{
-          if(op_size <= attributes->value_sz){
-            sprintf(&concat_buf[ptr_index], "%.*s", (int)op_size,
-                    attributes->value);
-            op_size -= op_size;
-            ptr_index += op_size;
-            offset += op_size;
-          }
-          else{
-            fprintf(stderr, "Read operation failed! Data don't exist.\n");
-            return 0;
-          }
-        }
-      }
-      else{
-        if(op_size >= MAX_OBJ_SIZE){
-          sprintf(&concat_buf[ptr_index], "%.*s",
-                  (int)(((base_key+i+1)*MAX_OBJ_SIZE) - offset),
-                  &attributes->value[offset]);
-          op_size -= (((base_key+i+1)*MAX_OBJ_SIZE) - offset);
-          ptr_index += (((base_key+i+1)*MAX_OBJ_SIZE) - offset);
-          offset += (((base_key+i+1)*MAX_OBJ_SIZE) - offset);
-        }
-        else{
-          sprintf(&concat_buf[ptr_index], "%.*s", (int)op_size,
-                  &attributes->value[offset]);
-          op_size -= op_size;
-          ptr_index += op_size;
-          offset += op_size;
-        }
-      }
+  Buffer buffer = Buffer::Buffer(ptr);
+  for (auto&& key : keys) {
+    if(cacheManager->isCached(key) != OPERATION_SUCCESSUL){
+      hyperdexClient->get(key);
     }
-    else{
-      fprintf(stderr, "Read operation failed! Data don't exist.\n");
-      return 0;
-    }
+    buffer.append(key.data+key.offset,key.size);
   }
-  ptr = concat_buf;
-  pointer[index->first] = file_offset + size*count;//move the file pointer
-  free(concat_buf);
-  return size*count;
+  objectStorePrefetcher->fetch(filename, fileOffset, operationSize);
+  posixMetadataManager->updateMetadataOnRead(stream, operationSize);
+
+  return operationSize;
+}
+/******************************************************************************
+*fwrite
+******************************************************************************/
+std::size_t fwrite(const void *ptr, size_t size, size_t count,
+                   FILE *stream) {
+  /*TODO: error checking
+   * operation size
+   * is fh valid or opened?
+   *
+   */
+  std::unique_ptr<API> apiInstance = API::getInstance();
+  std::unique_ptr<POSIXMetadataManager> posixMetadataManager =
+      (POSIXMetadataManager *) apiInstance->getMetadataManagerFactory()->
+          getMetadataManager(POSIX_METADATA_MANAGER);
+  std::unique_ptr<POSIXMapper> posixMapper =
+      (POSIXMapper *) apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER);
+  std::unique_ptr<CacheManager> cacheManager = apiInstance->getCacheManager();
+  std::unique_ptr<HyperdexClient> hyperdexClient =
+      (HyperdexClient *) apiInstance->getObjectStoreFactory()->getObjectStore(
+          HYPERDEX_CLIENT);
+
+  std::size_t operationSize = size * count;
+  const char *filename = posixMetadataManager->getFilename(stream);
+  std::size_t fileOffset = posixMetadataManager->getFpPosition(stream);
+
+  std::vector<Key> keys =
+      posixMapper->generateKeys(filename, fileOffset, operationSize);
+  std::size_t bufferIndex = 0;
+  for (auto &&key : keys) {
+    key.data = (void *) (ptr + bufferIndex);
+    hyperdexClient->put(key);
+    bufferIndex += key.size;
+  }
+  posixMetadataManager->updateMetadataOnWrite(stream, operationSize);
+  return operationSize;
 }

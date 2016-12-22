@@ -67,6 +67,28 @@ int POSIXMetadataManager::updateMetadataOnClose(FILE * fh, const char * filename
   return OPERATION_SUCCESSUL;
 }
 
+int POSIXMetadataManager::updateMetadataOnRead(FILE *fh, std::size_t operationSize) {
+  //TODO: error checking
+  const char * filename = getFilename(fh);
+  if(POSIX_MODE=="STRICT") created_files[filename].atime = time(NULL);
+  updateFpPosition(fh, operationSize, SEEK_CUR);
+  return OPERATION_SUCCESSUL;
+}
+
+int POSIXMetadataManager::updateMetadataOnWrite(FILE *fh,
+                                                std::size_t operationSize) {
+  //TODO: error checking
+  const char * filename = getFilename(fh);
+  if(POSIX_MODE=="STRICT"){
+    created_files[filename].atime = time(NULL);
+    created_files[filename].mtime = time(NULL);
+  }
+  std::size_t fileOffset = getFpPosition(fh);
+  created_files[filename].st_size = fileOffset + operationSize > created_files[filename].st_size ? fileOffset + operationSize : created_files[filename].st_size;
+  updateFpPosition(fh, operationSize, SEEK_CUR);
+  return OPERATION_SUCCESSUL;
+}
+
 long int POSIXMetadataManager::getFilesize(const char *filename) {
   std::unordered_map<const char *, Stat>::const_iterator fileIterator
         = created_files.find(filename);
@@ -106,6 +128,8 @@ size_t POSIXMetadataManager::getFpPosition(FILE *fh) {
   if(index == pointer.end()) return FP_NOT_EXIST;
   else return (size_t)index->second;
 }
+
+
 
 
 

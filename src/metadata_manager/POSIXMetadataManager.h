@@ -24,7 +24,7 @@ private:
     const char*     mode;       /* mode */
     uid_t           st_uid;     /* user ID of owner */
     gid_t           st_gid;     /* group ID of owner */
-    off_t           st_size;    /* total size, in bytes */
+    size_t          st_size;    /* total size, in bytes */
     time_t          atime;      /* time of last access */
     time_t          mtime;      /* time of last modification */
     time_t          ctime;      /* time of last status change */
@@ -39,8 +39,11 @@ public:
   int createMetadata(FILE * fh, const char * filename, const char* mode);
   int updateMetadataOnOpen(FILE * fh, const char * filename, const char* mode);
   int updateMetadataOnClose(FILE * fh, const char * filename);
+  int updateMetadataOnRead(FILE * fh, std::size_t operationSize);
+  int updateMetadataOnWrite(FILE *fh, std::size_t operationSize);
   int updateFpPosition(FILE * fh, long int offset, int origin);
-  size_t getFpPosition(FILE * fh);
+  std::size_t getFpPosition(FILE * fh);
+
 
 };
 

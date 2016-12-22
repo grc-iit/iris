@@ -11,10 +11,12 @@ std::unique_ptr<CacheManager> CacheManager::getInstance() {
   return instance;
 }
 
-std::vector<Key>
-CacheManager::isCached(std::vector<Key> &keys) {
-  std::vector<Key> cachedKeys;
-  return cachedKeys;
+int CacheManager::isCached(Key &key) {
+  return OPERATION_SUCCESSUL;
+}
+
+int CacheManager::cacheData(Key &key) {
+  return OPERATION_SUCCESSUL;
 }
 
 
