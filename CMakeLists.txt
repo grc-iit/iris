@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(iris)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -rdynamic")
 
 # Require HyperDex for this project:
 #set(HYPERDEX_LIBRARIES -L/usr/lib/ -lhyperdex-client -lhyperdex-admin)
