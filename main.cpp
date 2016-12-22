@@ -100,7 +100,7 @@ int basic(){
   fh = iris::fopen("file0.dat", "w");
   iris::fwrite(write_buf, 1, 100, fh);
   iris::fread(read_buf, 1, 100, fh);
-  iris::fclose(fh);*/
+  iris::fclose(fh);
 
   return 0;
 }
