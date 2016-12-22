@@ -76,7 +76,7 @@ int HyperdexClient::put(Key &key) {
       }
     }
   }
-  attribute.value = key.data;
+  attribute.value = (const char *) key.data;
   attribute.value_sz = key.size;
   op_id = hyperdex_client_put(hyperdexClient,
                               SPACE,
@@ -109,7 +109,7 @@ int HyperdexClient::init() {
   enum hyperdex_admin_returncode admin_status, loop_status;
   int64_t admin_id = 0, loop_id = 0;
 
-  /*Removing spaces*/
+  /*Removing previous spaces*/
   admin_id = hyperdex_admin_rm_space(admin, SPACE, &admin_status);
   loop_id = hyperdex_admin_loop(admin, -1, &loop_status);
   if (loop_id != admin_id || admin_status != HYPERDEX_ADMIN_SUCCESS) {
@@ -129,20 +129,12 @@ int HyperdexClient::init() {
     printf("Success creating space:{ %s }\n", SPACE);
   }
 
-  /* Checking of space creation and cluster stability*/
-  admin_id=0; loop_id=0;
-  admin_id= hyperdex_admin_validate_space(admin,DESCRIPTION, &admin_status);
-  loop_id = hyperdex_admin_loop(admin, -1, &loop_status);
-  if (loop_id != admin_id || admin_status != HYPERDEX_ADMIN_SUCCESS)
-  printf("Admin ID: %ld Status: %d \n Description: %s\n",
-         admin_id, admin_status, DESCRIPTION);
-
-  admin_id=0;loop_id=0;
+  /* Checking cluster stability*/
   admin_id = hyperdex_admin_wait_until_stable(admin, &admin_status);
   loop_id = hyperdex_admin_loop(admin, -1, &loop_status);
   if (loop_id != admin_id || admin_status != HYPERDEX_ADMIN_SUCCESS)
     printf("Admin ID: %ld Status: %d \n",admin_id, admin_status);
-  else printf("Cluster stable\n");*/
+  else printf("Cluster stable\n");
   hyperdex_admin_destroy(admin);
 
   /* Setup the hyperdex client */
