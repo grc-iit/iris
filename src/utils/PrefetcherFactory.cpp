@@ -1,7 +1,6 @@
 /******************************************************************************
 *include files
 ******************************************************************************/
-#include <memory>
 #include "PrefetcherFactory.h"
 #include "../constants.h"
 #include "FileSystemPrefetcher.h"

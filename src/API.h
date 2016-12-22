@@ -35,6 +35,7 @@
 #include "metadata_manager/S3MetadataManager.h"
 #include "object_stores/ObjectStoreFactory.h"
 
+
 /******************************************************************************
 *Class
 ******************************************************************************/
@@ -81,5 +82,8 @@ public:
     return objectStoreFactory;
   }
 };
-
+/******************************************************************************
+*Initialization of static
+******************************************************************************/
+std::shared_ptr<API> API::instance = nullptr;
 #endif //IRIS_ABSTRACTAPI_H

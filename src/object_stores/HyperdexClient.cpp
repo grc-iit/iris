@@ -67,7 +67,7 @@ int HyperdexClient::put(Key &key) {
     status=get(key);
     if(status==OPERATION_SUCCESSUL) {
       if (key.size > originalKey.offset + originalKey.size) {
-        std::memcpy(key.data + originalKey.offset, originalKey.data,
+        std::memcpy((char*)key.data + originalKey.offset, originalKey.data,
                     originalKey.size);
       } else{
         Buffer dataBuffer=Buffer(key.data,originalKey.offset);

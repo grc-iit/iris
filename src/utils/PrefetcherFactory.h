@@ -14,6 +14,7 @@
 *include files
 ******************************************************************************/
 #include "AbstractPrefetcher.h"
+#include <memory>
 
 class PrefetcherFactory {
 private:

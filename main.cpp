@@ -30,9 +30,8 @@ int main(int argc, char *args[]) {
 
   FILE* fh;
   fh = iris::fopen("file0.dat", "w");
-  //cout << "About to call fwrite" << endl;
-  bytes_written = iris::fwrite(write_buf, 1, 100, fh);
-  bytes_read =  iris::fread(read_buf, 1, 100, fh);
+  iris::fwrite(write_buf, 1, 100, fh);
+  iris::fread(read_buf, 1, 100, fh);
   iris::fclose(fh);
 
   return 0;

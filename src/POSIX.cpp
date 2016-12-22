@@ -3,6 +3,7 @@
 ******************************************************************************/
 #include <cstring>
 #include <algorithm>
+#include <iostream>
 #include "POSIX.h"
 #include "utils/Buffer.h"
 /******************************************************************************
@@ -118,6 +119,7 @@ size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
    * is fh valid or opened?
    *
    */
+  std::cout << "IRIS FWRITE HERE!!!!!!" << std::endl;
   std::shared_ptr<API> apiInstance = API::getInstance();
   std::shared_ptr<POSIXMetadataManager> posixMetadataManager =
       std::static_pointer_cast<POSIXMetadataManager>(apiInstance->

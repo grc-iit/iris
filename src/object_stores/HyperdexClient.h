@@ -31,5 +31,8 @@ public:
 
 };
 
-
+/******************************************************************************
+*Initialization of static
+******************************************************************************/
+std::shared_ptr<HyperdexClient> HyperdexClient::instance = nullptr;
 #endif //IRIS_HYPERDEXCLIENT_H
