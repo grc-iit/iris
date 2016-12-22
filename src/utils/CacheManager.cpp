@@ -4,9 +4,9 @@
 
 #include "CacheManager.h"
 
-std::unique_ptr<CacheManager> CacheManager::getInstance() {
+std::shared_ptr<CacheManager> CacheManager::getInstance() {
   if(instance== nullptr){
-    instance=new CacheManager();
+    instance=std::shared_ptr<CacheManager>(new CacheManager());
   }
   return instance;
 }

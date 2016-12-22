@@ -1,10 +1,5 @@
-#include <iostream>
-#include <unistd.h>
-#include <chrono>
-#include "/include/iris.h"
+#include "src/iris.h"
 
-
-//using namespace std::chrono;
 
 char *randstring(size_t length) {
   int n;
@@ -26,22 +21,19 @@ char *randstring(size_t length) {
 
 int main(int argc, char *args[]) {
 
-
-  char *write_buf;
-  size_t op_size = 2 * MAX_OBJ_SIZE;
+  char * write_buf;
+  size_t op_size = 2*MAX_OBJ_SIZE;
   write_buf = randstring(op_size);
-  char *read_buf = (char *) malloc(FILE_BUFFER_CAPACITY);
-  size_t bytes_read = 0;
-  size_t bytes_written = 0;
+  char * read_buf = (char *)malloc(FILE_BUFFER_CAPACITY);
+  size_t bytes_read=0;
+  size_t bytes_written =0;
 
-  FILE *fh;
-  fh = fopen("file0.dat", "w");
+  FILE* fh;
+  fh = iris::fopen("file0.dat", "w");
+  //cout << "About to call fwrite" << endl;
+  bytes_written = iris::fwrite(write_buf, 1, 100, fh);
+  bytes_read =  iris::fread(read_buf, 1, 100, fh);
+  iris::fclose(fh);
 
-  bytes_written = fwrite(write_buf, sizeof(char), 95, fh);
-
-  fseek(fh, 0, SEEK_SET);
-  bytes_written = fwrite(write_buf, sizeof(char), 5, fh);
-
-  int eof = fclose(fh);
   return 0;
 }

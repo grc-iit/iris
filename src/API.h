@@ -43,48 +43,43 @@ private:
 /******************************************************************************
 *Variables and members
 ******************************************************************************/
-    static std::unique_ptr<API> instance;
-    std::unique_ptr<CacheManager> cacheManager;
-    std::unique_ptr<PrefetcherFactory> prefetcherFactory;
-    std::unique_ptr<MetadataManagerFactory> metadataManagerFactory;
-    std::unique_ptr<MapperFactory> mapperFactory;
-    std::unique_ptr<ObjectStoreFactory> objectStoreFactory;
+  static std::shared_ptr<API> instance;
+  std::shared_ptr<CacheManager> cacheManager;
+  std::shared_ptr<PrefetcherFactory> prefetcherFactory;
+  std::shared_ptr<MetadataManagerFactory> metadataManagerFactory;
+  std::shared_ptr<MapperFactory> mapperFactory;
+  std::shared_ptr<ObjectStoreFactory> objectStoreFactory;
 
 /******************************************************************************
-*Constructor
+*Constructors
 ******************************************************************************/
-    API();
+  API();
 
 public:
 /******************************************************************************
 *Getters and setters
 ******************************************************************************/
-    static std::unique_ptr<API> getInstance();
+  static std::shared_ptr<API> getInstance();
 
-    std::unique_ptr<CacheManager> getCacheManager() {
-        return cacheManager;
-    }
+  std::shared_ptr<CacheManager> getCacheManager() {
+    return cacheManager;
+  }
 
-    std::unique_ptr<PrefetcherFactory> getPrefetcherFactory() {
-        return prefetcherFactory;
-    }
+  std::shared_ptr<PrefetcherFactory> getPrefetcherFactory() {
+    return prefetcherFactory;
+  }
 
-    std::unique_ptr<MetadataManagerFactory> getMetadataManagerFactory() {
-        return metadataManagerFactory;
-    }
+  std::shared_ptr<MetadataManagerFactory> getMetadataManagerFactory() {
+    return metadataManagerFactory;
+  }
 
-    std::unique_ptr<MapperFactory> getMapperFactory() {
-        return mapperFactory;
-    }
+  std::shared_ptr<MapperFactory> getMapperFactory() {
+    return mapperFactory;
+  }
 
-    std::unique_ptr<ObjectStoreFactory> getObjectStoreFactory() {
-        return objectStoreFactory;
-    }
-
-/******************************************************************************
-*Destructor
-******************************************************************************/
-    virtual ~API() {}
+  std::shared_ptr<ObjectStoreFactory> getObjectStoreFactory() {
+    return objectStoreFactory;
+  }
 };
 
 #endif //IRIS_ABSTRACTAPI_H

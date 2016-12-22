@@ -14,16 +14,17 @@
 MetadataManagerFactory::MetadataManagerFactory() {}
 MetadataManagerFactory::~MetadataManagerFactory() {}
 
-std::unique_ptr<MetadataManagerFactory> MetadataManagerFactory::getInstance() {
+std::shared_ptr<MetadataManagerFactory> MetadataManagerFactory::getInstance() {
   if(instance == nullptr){
-    instance = new MetadataManagerFactory();
+    instance =
+        std::shared_ptr<MetadataManagerFactory>(new MetadataManagerFactory());
   }
   return instance;
 }
 
-std::unique_ptr<IrisMetadataManager>
+std::shared_ptr<IrisMetadataManager>
 MetadataManagerFactory::getMetadataManager(const char *name) {
-  std::unique_ptr<IrisMetadataManager> metadataManagerInstance = nullptr;
+  IrisMetadataManager* metadataManagerInstance = nullptr;
   if(name == IRIS_METADATA_MANAGER){
     metadataManagerInstance = new IrisMetadataManager();
   }
@@ -43,8 +44,10 @@ MetadataManagerFactory::getMetadataManager(const char *name) {
     metadataManagerInstance = new S3MetadataManager();
   }
   else return nullptr;
-  return metadataManagerInstance;
+  return std::shared_ptr<IrisMetadataManager>(metadataManagerInstance);
 }
+
+
 
 
 

@@ -21,21 +21,22 @@ private:
 *Constructor
 ******************************************************************************/
   PrefetcherFactory();
+
+/******************************************************************************
+*Private members
+******************************************************************************/
+  static std::shared_ptr<PrefetcherFactory> instance;
+
+public:
 /******************************************************************************
 *Destructor
 ******************************************************************************/
   virtual ~PrefetcherFactory();
 /******************************************************************************
-*Private members
-******************************************************************************/
-  static std::unique_ptr<PrefetcherFactory> instance;
-
-public:
-/******************************************************************************
 *Gettters and setters
 ******************************************************************************/
-  static std::unique_ptr<PrefetcherFactory> getInstance();
-  std::unique_ptr<AbstractPrefetcher> getPrefetcher(const char* name);
+  static std::shared_ptr<PrefetcherFactory> getInstance();
+  std::shared_ptr<AbstractPrefetcher> getPrefetcher(const char* name);
 };
 
 

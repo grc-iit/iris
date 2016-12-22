@@ -3,6 +3,7 @@
 //
 
 #include <cstdlib>
+#include <cstdio>
 #include "POSIXMapper.h"
 
 std::vector<Key>
@@ -17,7 +18,7 @@ POSIXMapper::generateKeys(const char *name, size_t offset, size_t size) {
 
   while(remainingOperationSize!=0) {
     std::size_t baseOffset = ((baseKey + i) * MAX_OBJ_SIZE);
-    sprintf(key.name, "%s_%ld", name, (baseKey + i));
+    std::sprintf(key.name, "%s_%ld", name, (baseKey + i));
     if (offset == baseOffset) {
       key.offset = 0;
       if (remainingOperationSize < MAX_OBJ_SIZE) {

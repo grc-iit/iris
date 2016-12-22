@@ -7,7 +7,6 @@
 
 
 #include <vector>
-#include <cstdio>
 #include "AbstractMapper.h"
 #include "../constants.h"
 

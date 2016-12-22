@@ -16,9 +16,9 @@ HyperdexClient::HyperdexClient() {
 HyperdexClient::~HyperdexClient() {}
 
 
-std::unique_ptr<HyperdexClient> HyperdexClient::getInstance() {
+std::shared_ptr<HyperdexClient> HyperdexClient::getInstance() {
   if (instance == nullptr) {
-    instance = new HyperdexClient();
+    instance = std::shared_ptr<HyperdexClient>(new HyperdexClient());
   }
   return instance;
 }

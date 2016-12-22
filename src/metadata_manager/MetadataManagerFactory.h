@@ -10,13 +10,11 @@
 
 class MetadataManagerFactory {
 private:
-  static std::unique_ptr<MetadataManagerFactory> instance;
+  static std::shared_ptr<MetadataManagerFactory> instance;
   MetadataManagerFactory();
-
-
 public:
-  static std::unique_ptr<MetadataManagerFactory> getInstance();
-  std::unique_ptr<IrisMetadataManager> getMetadataManager(const char* name);
+  static std::shared_ptr<MetadataManagerFactory> getInstance();
+  std::shared_ptr<IrisMetadataManager> getMetadataManager(const char* name);
   virtual ~MetadataManagerFactory();
 };
 

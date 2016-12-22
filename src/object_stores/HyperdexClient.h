@@ -13,12 +13,12 @@
 
 class HyperdexClient : public AbstractObjectStore {
 private:
-  static std::unique_ptr<HyperdexClient> instance;
+  static std::shared_ptr<HyperdexClient> instance;
   HyperdexClient();
   int init();
   struct hyperdex_client* hyperdexClient;
 public:
-  static std::unique_ptr<HyperdexClient> getInstance();
+  static std::shared_ptr<HyperdexClient> getInstance();
 
   int get(Key &key) override;
 

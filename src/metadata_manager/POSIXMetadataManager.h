@@ -14,11 +14,6 @@
 class POSIXMetadataManager: public IrisMetadataManager {
 private:
   /*filename plus metadata information*/
-  std::unordered_map<const char *, Stat> created_files;
-  /*file handler to filename mapping*/
-  std::unordered_map<FILE *, const char *> fh2filename;
-  /*file position for every file handler that is opened*/
-  std::unordered_map<FILE *, long int> pointer;
   struct Stat {
     bool            opened;     /*flag if the file is opened*/
     const char*     mode;       /* mode */
@@ -29,6 +24,12 @@ private:
     time_t          mtime;      /* time of last modification */
     time_t          ctime;      /* time of last status change */
   };
+  std::unordered_map<const char *, Stat> created_files;
+  /*file handler to filename mapping*/
+  std::unordered_map<FILE *, const char *> fh2filename;
+  /*file position for every file handler that is opened*/
+  std::unordered_map<FILE *, long int> pointer;
+
 
   long int getFilesize(const char * filename);
 

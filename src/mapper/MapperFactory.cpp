@@ -20,14 +20,14 @@ MapperFactory::~MapperFactory() {}
 /******************************************************************************
 *Gettters and setters
 ******************************************************************************/
-std::unique_ptr<MapperFactory> MapperFactory::getInstance() {
+std::shared_ptr<MapperFactory> MapperFactory::getInstance() {
   if(instance== nullptr){
-    instance=new MapperFactory();
+    instance=std::shared_ptr<MapperFactory>(new MapperFactory());
   }
   return instance;
 }
-std::unique_ptr<AbstractMapper> MapperFactory::getMapper(const char *name) {
-  std::unique_ptr<AbstractMapper> mapperInstance = nullptr;
+std::shared_ptr<AbstractMapper> MapperFactory::getMapper(const char *name) {
+  AbstractMapper* mapperInstance = nullptr;
   if(name == POSIX_MAPPER){
     mapperInstance = new POSIXMapper();
   }
@@ -44,5 +44,6 @@ std::unique_ptr<AbstractMapper> MapperFactory::getMapper(const char *name) {
     mapperInstance = new S3Mapper();
   }
   else return nullptr;
-  return mapperInstance;
+  return std::shared_ptr<AbstractMapper>(mapperInstance);
 }
+

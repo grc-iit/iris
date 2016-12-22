@@ -11,11 +11,11 @@
 /******************************************************************************
 *fopen
 ******************************************************************************/
-FILE *fopen(const char *filename, const char *mode) {
-  std::unique_ptr<API> apiInstance = API::getInstance();
-  std::unique_ptr<POSIXMetadataManager> posixMetadataManager =
-      (POSIXMetadataManager*)apiInstance->getMetadataManagerFactory()->
-          getMetadataManager(POSIX_METADATA_MANAGER);
+FILE *iris::fopen(const char *filename, const char *mode) {
+  std::shared_ptr<API> apiInstance = API::getInstance();
+  std::shared_ptr<POSIXMetadataManager> posixMetadataManager =
+      std::static_pointer_cast<POSIXMetadataManager>(apiInstance->
+          getMetadataManagerFactory()->getMetadataManager(POSIX_METADATA_MANAGER));
 
   /*Check if the filename is longer than allowed (<256)*/
   if(std::strlen(filename) > MAX_FILENAME_LENGTH){
@@ -48,11 +48,11 @@ FILE *fopen(const char *filename, const char *mode) {
 /******************************************************************************
 *fclose
 ******************************************************************************/
-int fclose(FILE *stream) {
-  std::unique_ptr<API> apiInstance = API::getInstance();
-  std::unique_ptr<POSIXMetadataManager> posixMetadataManager =
-      (POSIXMetadataManager*)apiInstance->getMetadataManagerFactory()->
-          getMetadataManager(POSIX_METADATA_MANAGER);
+int iris::fclose(FILE *stream) {
+  std::shared_ptr<API> apiInstance = API::getInstance();
+  std::shared_ptr<POSIXMetadataManager> posixMetadataManager =
+      std::static_pointer_cast<POSIXMetadataManager>(apiInstance->
+          getMetadataManagerFactory()->getMetadataManager(POSIX_METADATA_MANAGER));
 
   const char * filename = posixMetadataManager->getFilename(stream);
   if (posixMetadataManager->checkIfFileIsOpen(filename)) return -1;
@@ -66,11 +66,11 @@ int fclose(FILE *stream) {
 /******************************************************************************
 *fseek
 ******************************************************************************/
-int fseek(FILE *stream, long int offset, int origin) {
-  std::unique_ptr<API> apiInstance = API::getInstance();
-  std::unique_ptr<POSIXMetadataManager> posixMetadataManager =
-      (POSIXMetadataManager*)apiInstance->getMetadataManagerFactory()->
-          getMetadataManager(POSIX_METADATA_MANAGER);
+int iris::fseek(FILE *stream, long int offset, int origin) {
+  std::shared_ptr<API> apiInstance = API::getInstance();
+  std::shared_ptr<POSIXMetadataManager> posixMetadataManager =
+      std::static_pointer_cast<POSIXMetadataManager>(apiInstance->
+          getMetadataManagerFactory()->getMetadataManager(POSIX_METADATA_MANAGER));
   posixMetadataManager->updateFpPosition(stream, offset, origin);
   return 0;
 }
@@ -78,18 +78,18 @@ int fseek(FILE *stream, long int offset, int origin) {
 /******************************************************************************
 *fread
 ******************************************************************************/
-std::size_t fread(void *ptr, std::size_t size, std::size_t count, FILE *stream) {
-  std::unique_ptr<API> apiInstance = API::getInstance();
-  std::unique_ptr<POSIXMetadataManager> posixMetadataManager =
-      (POSIXMetadataManager*)apiInstance->getMetadataManagerFactory()->
-          getMetadataManager(POSIX_METADATA_MANAGER);
-  std::unique_ptr<POSIXMapper> posixMapper =
-      (POSIXMapper*)apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER);
-  std::unique_ptr<CacheManager> cacheManager = apiInstance->getCacheManager();
-  std::unique_ptr<ObjectStorePrefetcher> objectStorePrefetcher =
-      (ObjectStorePrefetcher*)apiInstance->getPrefetcherFactory()->getPrefetcher(OBJECTSTORE_PREFETCHER);
-  std::unique_ptr<HyperdexClient> hyperdexClient =
-      (HyperdexClient*)apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT);
+size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream) {
+  std::shared_ptr<API> apiInstance = API::getInstance();
+  std::shared_ptr<POSIXMetadataManager> posixMetadataManager =
+      std::static_pointer_cast<POSIXMetadataManager>(apiInstance->
+          getMetadataManagerFactory()->getMetadataManager(POSIX_METADATA_MANAGER));
+  std::shared_ptr<POSIXMapper> posixMapper =
+      std::static_pointer_cast<POSIXMapper>(apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER));
+  std::shared_ptr<CacheManager> cacheManager = apiInstance->getCacheManager();
+  std::shared_ptr<ObjectStorePrefetcher> objectStorePrefetcher =
+      std::static_pointer_cast<ObjectStorePrefetcher>(apiInstance->getPrefetcherFactory()->getPrefetcher(OBJECTSTORE_PREFETCHER));
+  std::shared_ptr<HyperdexClient> hyperdexClient =
+      std::static_pointer_cast<HyperdexClient>(apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT));
 
   std::size_t operationSize = size*count;
   const char * filename = posixMetadataManager->getFilename(stream);
@@ -97,12 +97,12 @@ std::size_t fread(void *ptr, std::size_t size, std::size_t count, FILE *stream) 
   std::vector<Key> keys =
       posixMapper->generateKeys(filename, fileOffset, operationSize);
 
-  Buffer buffer = Buffer::Buffer(ptr);
+  Buffer buffer = Buffer(ptr);
   for (auto&& key : keys) {
     if(cacheManager->isCached(key) != OPERATION_SUCCESSUL){
       hyperdexClient->get(key);
     }
-    buffer.append(key.data+key.offset,key.size);
+    buffer.append((char*)key.data+key.offset,key.size);
   }
   objectStorePrefetcher->fetch(filename, fileOffset, operationSize);
   posixMetadataManager->updateMetadataOnRead(stream, operationSize);
@@ -112,23 +112,20 @@ std::size_t fread(void *ptr, std::size_t size, std::size_t count, FILE *stream) 
 /******************************************************************************
 *fwrite
 ******************************************************************************/
-std::size_t fwrite(const void *ptr, size_t size, size_t count,
-                   FILE *stream) {
+size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
   /*TODO: error checking
    * operation size
    * is fh valid or opened?
    *
    */
-  std::unique_ptr<API> apiInstance = API::getInstance();
-  std::unique_ptr<POSIXMetadataManager> posixMetadataManager =
-      (POSIXMetadataManager *) apiInstance->getMetadataManagerFactory()->
-          getMetadataManager(POSIX_METADATA_MANAGER);
-  std::unique_ptr<POSIXMapper> posixMapper =
-      (POSIXMapper *) apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER);
-  std::unique_ptr<CacheManager> cacheManager = apiInstance->getCacheManager();
-  std::unique_ptr<HyperdexClient> hyperdexClient =
-      (HyperdexClient *) apiInstance->getObjectStoreFactory()->getObjectStore(
-          HYPERDEX_CLIENT);
+  std::shared_ptr<API> apiInstance = API::getInstance();
+  std::shared_ptr<POSIXMetadataManager> posixMetadataManager =
+      std::static_pointer_cast<POSIXMetadataManager>(apiInstance->
+          getMetadataManagerFactory()->getMetadataManager(POSIX_METADATA_MANAGER));
+  std::shared_ptr<POSIXMapper> posixMapper =
+      std::static_pointer_cast<POSIXMapper>(apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER));
+  std::shared_ptr<HyperdexClient> hyperdexClient =
+      std::static_pointer_cast<HyperdexClient>(apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT));
 
   std::size_t operationSize = size * count;
   const char *filename = posixMetadataManager->getFilename(stream);
@@ -138,7 +135,7 @@ std::size_t fwrite(const void *ptr, size_t size, size_t count,
       posixMapper->generateKeys(filename, fileOffset, operationSize);
   std::size_t bufferIndex = 0;
   for (auto &&key : keys) {
-    key.data = (void *) (ptr + bufferIndex);
+    key.data = (void *) ((char*)ptr + bufferIndex);
     hyperdexClient->put(key);
     bufferIndex += key.size;
   }

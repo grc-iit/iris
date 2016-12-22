@@ -11,7 +11,8 @@
 #ifndef IRIS_CONSTANTS_H
 #define IRIS_CONSTANTS_H
 
-#include <cstdio>
+
+#include <cstring>
 #include "return_codes.h"
 /******************************************************************************
 *Prefetcher

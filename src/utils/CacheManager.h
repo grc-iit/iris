@@ -6,18 +6,16 @@
 #define IRIS_CACHEMANAGER_H
 
 
-#include <bits/unique_ptr.h>
+#include <memory>
 #include <vector>
 #include "../constants.h"
 
 class CacheManager {
 private:
-  static std::unique_ptr<CacheManager> instance;
-  CacheManager(){
-
-  }
+  static std::shared_ptr<CacheManager> instance;
+  CacheManager(){}
 public:
-  static std::unique_ptr<CacheManager> getInstance();
+  static std::shared_ptr<CacheManager> getInstance();
   int isCached(Key &key);
   int cacheData(Key &key);
 };

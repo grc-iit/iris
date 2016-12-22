@@ -12,9 +12,9 @@ API::API() {
 /******************************************************************************
 *Getters and setters
 ******************************************************************************/
-static std::unique_ptr<API> API::getInstance() {
+std::shared_ptr<API> API::getInstance() {
   if(instance== nullptr){
-    instance=new API();
+    instance=std::shared_ptr<API>(new API());
   }
   return instance;
 }

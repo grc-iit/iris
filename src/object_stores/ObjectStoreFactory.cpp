@@ -9,19 +9,20 @@ ObjectStoreFactory::ObjectStoreFactory() {}
 
 ObjectStoreFactory::~ObjectStoreFactory() {}
 
-std::unique_ptr<ObjectStoreFactory> ObjectStoreFactory::getInstance() {
+std::shared_ptr<ObjectStoreFactory> ObjectStoreFactory::getInstance() {
   if (instance == nullptr) {
-    instance = new ObjectStoreFactory();
+    instance = std::shared_ptr<ObjectStoreFactory>(new ObjectStoreFactory());
   }
   return instance;
 }
 
-std::unique_ptr<AbstractObjectStore> ObjectStoreFactory::getObjectStore(std::string name) {
-  std::unique_ptr<AbstractObjectStore> objectStoreClient;
+std::shared_ptr<AbstractObjectStore> ObjectStoreFactory::getObjectStore(std::string name) {
+  std::shared_ptr<AbstractObjectStore> objectStoreClient;
   if (name == HYPERDEX_CLIENT) {
-    objectStoreClient = HyperdexClient::getInstance();
+    objectStoreClient =
+        std::static_pointer_cast<HyperdexClient>(HyperdexClient::getInstance());
   }
-  return std::unique_ptr<AbstractObjectStore>();
+  return objectStoreClient;
 }
 
 

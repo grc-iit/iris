@@ -13,12 +13,11 @@
 /******************************************************************************
 *include files
 ******************************************************************************/
-#include "/src/constants.h"
-#include "/src/POSIX.h"
-#include "/src/S3.h"
-#include "/src/HDF5.h"
-#include "/src/MPIIO.h"
-#include "/src/PNETCDF.h"
+#include "POSIX.h"
+#include "S3.h"
+#include "HDF5.h"
+#include "MPIIO.h"
+#include "PNETCDF.h"
 
 
 #endif //IRIS_IRIS_H

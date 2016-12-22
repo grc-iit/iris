@@ -11,12 +11,12 @@
 
 class ObjectStoreFactory {
 private:
-  static std::unique_ptr<ObjectStoreFactory> instance;
+  static std::shared_ptr<ObjectStoreFactory> instance;
   ObjectStoreFactory();
 
 public:
-  static std::unique_ptr<ObjectStoreFactory> getInstance();
-  std::unique_ptr<AbstractObjectStore> getObjectStore(std::string name);
+  static std::shared_ptr<ObjectStoreFactory> getInstance();
+  std::shared_ptr<AbstractObjectStore> getObjectStore(std::string name);
   virtual ~ObjectStoreFactory();
 };
 

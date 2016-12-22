@@ -8,10 +8,9 @@
 
 int ObjectStorePrefetcher::fetch(const char *fileName, size_t fileOffset, size_t operationSize) {
   int prefetchingMode = 0;
-  std::unique_ptr<POSIXMapper> posixMapper =
-      (POSIXMapper *) mapperFactory->getMapper(POSIX_MAPPER);
-  std::unique_ptr<HyperdexClient> client = (HyperdexClient *) objectStoreFactory->getObjectStore(
-      HYPERDEX_CLIENT);
+  std::shared_ptr<POSIXMapper> posixMapper = std::static_pointer_cast<POSIXMapper> (mapperFactory->getMapper(POSIX_MAPPER));
+  std::shared_ptr<HyperdexClient> client = std::static_pointer_cast<HyperdexClient> (objectStoreFactory->getObjectStore(HYPERDEX_CLIENT));
+
   int status = engine(fileName, fileOffset, operationSize, prefetchingMode);
   std::vector<Key> keys = posixMapper->generateKeys(fileName, fileOffset,
                                                     operationSize);

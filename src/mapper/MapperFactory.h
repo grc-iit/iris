@@ -27,14 +27,14 @@ private:
 /******************************************************************************
 *Private members
 ******************************************************************************/
-  static std::unique_ptr<MapperFactory> instance;
+  static std::shared_ptr<MapperFactory> instance;
 
 public:
 /******************************************************************************
 *Gettters and setters
 ******************************************************************************/
-  static std::unique_ptr<MapperFactory> getInstance();
-  std::unique_ptr<AbstractMapper> getMapper(const char* name);
+  static std::shared_ptr<MapperFactory> getInstance();
+  std::shared_ptr<AbstractMapper> getMapper(const char* name);
 /******************************************************************************
 *Destructor
 ******************************************************************************/
