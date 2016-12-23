@@ -16,7 +16,7 @@ std::shared_ptr<CacheManager> CacheManager::getInstance() {
 }
 
 int CacheManager::isCached(Key &key) {
-  return OPERATION_SUCCESSUL;
+  return CACHE_MANAGER_NO_DATA_FOUND;
 }
 
 int CacheManager::cacheData(Key &key) {

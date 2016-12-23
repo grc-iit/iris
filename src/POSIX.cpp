@@ -148,8 +148,8 @@ size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
       posixMapper->generateKeys(filename, fileOffset, operationSize);
     std::size_t bufferIndex = 0;
   for (auto &&key : keys) {
-      Buffer buffer=Buffer((void *) ((char*)ptr + bufferIndex),key.size);
-    key.data = buffer.data();
+    key.data=malloc(key.size);
+    memcpy(key.data,(char*)ptr + bufferIndex,key.size);
     hyperdexClient->put(key);
     bufferIndex += key.size;
   }

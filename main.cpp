@@ -85,7 +85,9 @@ int test3(){
 
   FILE* fh;
   fh = iris::fopen("file1.dat", "w");
-  iris::fwrite(write_buf, 1, 10, fh);
+  iris::fwrite(write_buf, 1, 30, fh);
   iris::fclose(fh);
+  fh = iris::fopen("file1.dat", "r");
+  iris::fread(read_buf, 1, 30, fh);
   return 0;
 }

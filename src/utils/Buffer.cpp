@@ -1,6 +1,7 @@
 /******************************************************************************
 *include files
 ******************************************************************************/
+#include <iostream>
 #include "Buffer.h"
 /******************************************************************************
 *Constructors
@@ -37,7 +38,6 @@ Buffer::Buffer(const void* d, size_type s)
   {
     data_ = new char[s];
     std::memcpy (data_, d, s);
-    printf("Buffer Data %s",data_);
   }
   else data_ = 0;
   size_ = capacity_ = s;
