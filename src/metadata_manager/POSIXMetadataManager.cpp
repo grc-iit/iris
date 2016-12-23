@@ -30,7 +30,7 @@ const char *POSIXMetadataManager::getFilename(FILE *fh) {
 int POSIXMetadataManager::createMetadata(FILE * fh, const char * filename, const char* mode) {
   //TODO: error checking
   Stat file_metadata;
-  if(POSIX_MODE=="STRICT") file_metadata = {true, mode, getuid(), getgid(), 0,
+  if(strcmp(POSIX_MODE,"STRICT")==0) file_metadata = {true, mode, getuid(), getgid(), 0,
                           time(NULL), time(NULL), time(NULL)};
   else file_metadata = {true, mode, 0, 0, 0, 0, 0, 0};
 
@@ -42,7 +42,7 @@ int POSIXMetadataManager::createMetadata(FILE * fh, const char * filename, const
 
 int POSIXMetadataManager::updateMetadataOnOpen(FILE * fh, const char * filename, const char* mode) {
   //TODO: error checking
-  if(POSIX_MODE=="STRICT")
+  if(strcmp(POSIX_MODE,"STRICT")==0)
   created_files[filename] = {true, mode, created_files[filename].st_uid, created_files[filename].st_gid,
                              created_files[filename].st_size, time(NULL),
                              created_files[filename].mtime,
@@ -56,7 +56,7 @@ int POSIXMetadataManager::updateMetadataOnOpen(FILE * fh, const char * filename,
 
 int POSIXMetadataManager::updateMetadataOnClose(FILE * fh, const char * filename) {
   //TODO: error checking
-  if(POSIX_MODE=="STRICT"){
+  if(strcmp(POSIX_MODE,"STRICT")==0){
     created_files[filename].opened = false;
     created_files[filename].atime = time(NULL);
   }
@@ -70,7 +70,7 @@ int POSIXMetadataManager::updateMetadataOnClose(FILE * fh, const char * filename
 int POSIXMetadataManager::updateMetadataOnRead(FILE *fh, std::size_t operationSize) {
   //TODO: error checking
   const char * filename = getFilename(fh);
-  if(POSIX_MODE=="STRICT") created_files[filename].atime = time(NULL);
+  if(strcmp(POSIX_MODE,"STRICT")==0) created_files[filename].atime = time(NULL);
   updateFpPosition(fh, operationSize, SEEK_CUR);
   return OPERATION_SUCCESSUL;
 }
@@ -79,7 +79,7 @@ int POSIXMetadataManager::updateMetadataOnWrite(FILE *fh,
                                                 std::size_t operationSize) {
   //TODO: error checking
   const char * filename = getFilename(fh);
-  if(POSIX_MODE=="STRICT"){
+  if(strcmp(POSIX_MODE,"STRICT")==0){
     created_files[filename].atime = time(NULL);
     created_files[filename].mtime = time(NULL);
   }

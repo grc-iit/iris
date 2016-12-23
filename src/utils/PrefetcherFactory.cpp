@@ -29,10 +29,10 @@ std::shared_ptr<PrefetcherFactory> PrefetcherFactory::getInstance() {
 }
 std::shared_ptr<AbstractPrefetcher> PrefetcherFactory::getPrefetcher(const char *name) {
   AbstractPrefetcher* prefetcherInstance= nullptr;
-  if(name == FILESYSTEM_PREFETCHER){
+  if(strcmp(name,FILESYSTEM_PREFETCHER)==0){
     prefetcherInstance=new FileSystemPrefetcher();
   }
-  else if(name == OBJECTSTORE_PREFETCHER){
+  else if(strcmp(name,OBJECTSTORE_PREFETCHER)==0){
     prefetcherInstance=new ObjectStorePrefetcher();
   }
   else return nullptr;
