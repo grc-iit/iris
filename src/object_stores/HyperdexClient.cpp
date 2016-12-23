@@ -42,12 +42,17 @@ int HyperdexClient::get(Key &key) {
                               &attributes_sz);
   loop_id = hyperdex_client_loop(hyperdexClient, -1, &loop_status);
   if (op_id == loop_id && loop_status == HYPERDEX_CLIENT_SUCCESS){
-    key.data = &attributes;
-    key.size = attributes_sz;
+    key.data = (void*) attributes[0].value;
+    //key.data=malloc(attributes[0].value_sz);
+    //memcpy(key.data,attributes[0].value,attributes[0].value_sz);
+    key.size = attributes[0].value_sz;
   }
   else{
     return HYPERDEX_GET_OPERATION_FAILED;
   }
+#ifdef DEBUG
+  std::printf("Getting Data \nkey Name : %s key Data %s \n", key.name,key.data );
+#endif
   return OPERATION_SUCCESSUL;
 }
 
@@ -58,12 +63,16 @@ int HyperdexClient::put(Key &key) {
   int64_t op_id=0, loop_id=0;
 
   Key originalKey=key;
+  Buffer dataBuffer;
+#ifdef DEBUG
+  std::printf("Key before Put \nkey Name : %s key Data %s \n", key.name,key.data );
+#endif
 
   if(key.offset==0){
     if(key.size!=MAX_OBJ_SIZE){
       status=get(key);
       if(status==OPERATION_SUCCESSUL && key.size > originalKey.size){
-        Buffer dataBuffer=Buffer(key.data);
+        dataBuffer=Buffer(key.data,key.size);
         dataBuffer.assign(originalKey.data,originalKey.size);
         key.data=dataBuffer.data();
       }
@@ -75,14 +84,16 @@ int HyperdexClient::put(Key &key) {
         std::memcpy((char*)key.data + originalKey.offset, originalKey.data,
                     originalKey.size);
       } else{
-        Buffer dataBuffer=Buffer(key.data,originalKey.offset);
+        dataBuffer=Buffer(key.data,originalKey.offset);
         dataBuffer.append(originalKey.data);
         key.data=dataBuffer.data();
       }
     }
   }
+  attribute.attr =ATTRIBUTE_NAME;
   attribute.value = (const char *) key.data;
   attribute.value_sz = key.size;
+  attribute.datatype=HYPERDATATYPE_STRING;
   op_id = hyperdex_client_put(hyperdexClient,
                               SPACE,
                               key.name,
@@ -92,8 +103,14 @@ int HyperdexClient::put(Key &key) {
                               &op_status);
   loop_id = hyperdex_client_loop(hyperdexClient, -1, &loop_status);
   if (loop_id != op_id || loop_status != HYPERDEX_CLIENT_SUCCESS) {
+#ifdef DEBUG
+    std::cout<< HYPERDEX_PUT_OPERATION_FAILED << " Hyperdex put status " << loop_status << std::endl;
+#endif
     return HYPERDEX_PUT_OPERATION_FAILED;
   }
+#ifdef DEBUG
+  std::printf("Put Data \nkey Name : %s key Data %s \n", key.name,key.data );
+#endif
   return OPERATION_SUCCESSUL;
 }
 

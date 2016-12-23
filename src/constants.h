@@ -60,6 +60,7 @@ struct Key{
 #define MAX_OBJ_SIZE 20
 //Hyperdex parameters
 #define SPACE "IRIS_KEYSPACE"
+#define ATTRIBUTE_NAME "data"
 #define DESCRIPTION "space IRIS_KEYSPACE key offset attributes data"
 #define COORDINATOR  "127.0.0.1"
 #define COORDINATOR_PORT 1982

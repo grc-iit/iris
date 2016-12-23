@@ -29,10 +29,7 @@ private:
   std::unordered_map<FILE *, const char *> fh2filename;
   /*file position for every file handler that is opened*/
   std::unordered_map<FILE *, long int> pointer;
-
-
   long int getFilesize(const char * filename);
-
 public:
   POSIXMetadataManager();
   bool checkIfFileExists(const char *filename);

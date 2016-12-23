@@ -13,6 +13,9 @@
 *fopen
 ******************************************************************************/
 FILE *iris::fopen(const char *filename, const char *mode) {
+#ifdef DEBUG
+    std::cout << "Inside fopen start" << std::endl;
+#endif/*DEBUG*/
   std::shared_ptr<API> apiInstance = API::getInstance();
   std::shared_ptr<POSIXMetadataManager> posixMetadataManager =
       std::static_pointer_cast<POSIXMetadataManager>(apiInstance->
@@ -43,6 +46,9 @@ FILE *iris::fopen(const char *filename, const char *mode) {
     }
     posixMetadataManager->createMetadata(fh, filename, mode);
   }
+#ifdef DEBUG
+    std::cout << "Inside fopen end" << std::endl;
+#endif/*DEBUG*/
   return fh;
 }
 
@@ -56,11 +62,14 @@ int iris::fclose(FILE *stream) {
           getMetadataManagerFactory()->getMetadataManager(POSIX_METADATA_MANAGER));
 
   const char * filename = posixMetadataManager->getFilename(stream);
-  if (posixMetadataManager->checkIfFileIsOpen(filename)) return -1;
+  if (!posixMetadataManager->checkIfFileIsOpen(filename)) return -1;
   else {
     std::fclose(stream);
     posixMetadataManager->updateMetadataOnClose(stream, filename);
   }
+#ifdef DEBUG
+    std::cout << "Inside fclose end" << std::endl;
+#endif/*DEBUG*/
   return 0;
 }
 
@@ -107,7 +116,9 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
   }
   objectStorePrefetcher->fetch(filename, fileOffset, operationSize);
   posixMetadataManager->updateMetadataOnRead(stream, operationSize);
-
+#ifdef DEBUG
+    std::cout << "Inside fread end" << std::endl;
+#endif/*DEBUG*/
   return operationSize;
 }
 /******************************************************************************
@@ -135,12 +146,16 @@ size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
 
   std::vector<Key> keys =
       posixMapper->generateKeys(filename, fileOffset, operationSize);
-  std::size_t bufferIndex = 0;
+    std::size_t bufferIndex = 0;
   for (auto &&key : keys) {
-    key.data = (void *) ((char*)ptr + bufferIndex);
+      Buffer buffer=Buffer((void *) ((char*)ptr + bufferIndex),key.size);
+    key.data = buffer.data();
     hyperdexClient->put(key);
     bufferIndex += key.size;
   }
   posixMetadataManager->updateMetadataOnWrite(stream, operationSize);
+#ifdef DEBUG
+    std::cout << "Inside fwrite end" << std::endl;
+#endif/*DEBUG*/
   return operationSize;
 }

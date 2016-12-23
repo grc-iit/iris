@@ -6,10 +6,12 @@
 #define IRIS_METADATAMANAGERFACTORY_H
 
 #include <memory>
+#include <unordered_map>
 #include "IrisMetadataManager.h"
 
 class MetadataManagerFactory {
 private:
+    std::unordered_map<const char*, std::shared_ptr<IrisMetadataManager>> metadataManagerMap;
   static std::shared_ptr<MetadataManagerFactory> instance;
   MetadataManagerFactory();
 public:

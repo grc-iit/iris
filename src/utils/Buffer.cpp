@@ -37,6 +37,7 @@ Buffer::Buffer(const void* d, size_type s)
   {
     data_ = new char[s];
     std::memcpy (data_, d, s);
+    printf("Buffer Data %s",data_);
   }
   else data_ = 0;
   size_ = capacity_ = s;
@@ -104,6 +105,7 @@ void Buffer::update(const void *data, Buffer::size_type offset,
 
 Buffer& Buffer::operator= (const Buffer& x)
 {
+
   if(&x != this)
   {
     if(x.size_ > capacity_)
