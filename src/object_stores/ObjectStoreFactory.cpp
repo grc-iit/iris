@@ -20,7 +20,8 @@ std::shared_ptr<ObjectStoreFactory> ObjectStoreFactory::getInstance() {
   return instance;
 }
 
-std::shared_ptr<AbstractObjectStore> ObjectStoreFactory::getObjectStore(std::string name) {
+std::shared_ptr<AbstractObjectStore> ObjectStoreFactory::getObjectStore(const
+                                                                        char* name) {
   std::shared_ptr<AbstractObjectStore> objectStoreClient;
   if (strcmp(name,HYPERDEX_CLIENT)==0) {
     objectStoreClient =

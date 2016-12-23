@@ -34,9 +34,8 @@ private:
   long int getFilesize(const char * filename);
 
 public:
-    POSIXMetadataManager();
-
-    bool checkIfFileExists(const char *filename);
+  POSIXMetadataManager();
+  bool checkIfFileExists(const char *filename);
   bool checkIfFileIsOpen(const char *filename);
   const char * getFilename(FILE *fh);
   int createMetadata(FILE * fh, const char * filename, const char* mode);

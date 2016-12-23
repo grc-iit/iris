@@ -16,7 +16,8 @@ private:
 
 public:
   static std::shared_ptr<ObjectStoreFactory> getInstance();
-  std::shared_ptr<AbstractObjectStore> getObjectStore(std::string name);
+  std::shared_ptr<AbstractObjectStore> getObjectStore(const
+                                                      char* name);
   virtual ~ObjectStoreFactory();
 };
 
