@@ -22,7 +22,7 @@ std::shared_ptr<ObjectStoreFactory> ObjectStoreFactory::getInstance() {
 
 std::shared_ptr<AbstractObjectStore> ObjectStoreFactory::getObjectStore(std::string name) {
   std::shared_ptr<AbstractObjectStore> objectStoreClient;
-  if (name == HYPERDEX_CLIENT) {
+  if (strcmp(name,HYPERDEX_CLIENT)==0) {
     objectStoreClient =
         std::static_pointer_cast<HyperdexClient>(HyperdexClient::getInstance());
   }

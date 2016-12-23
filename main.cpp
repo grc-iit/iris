@@ -78,7 +78,8 @@ int main(int argc, char *args[]) {
   sigaction(SIGSEGV, &sa, NULL);
 */
   std::cout << "Main" << std::endl;
-  basic();
+  firstTest();
+  //basic();
   return 0;
 }
 int firstTest(){
@@ -97,7 +98,7 @@ int basic(){
   size_t bytes_written =0;
 
   FILE* fh;
-  fh = iris::fopen("file0.dat", "w");
+  fh = iris::fopen("file1.dat", "w");
   iris::fwrite(write_buf, 1, 100, fh);
   iris::fread(read_buf, 1, 100, fh);
   iris::fclose(fh);

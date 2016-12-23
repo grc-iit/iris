@@ -32,16 +32,16 @@ std::shared_ptr<MapperFactory> MapperFactory::getInstance() {
 }
 std::shared_ptr<AbstractMapper> MapperFactory::getMapper(const char *name) {
   AbstractMapper* mapperInstance = nullptr;
-  if(name == POSIX_MAPPER){
+  if(strcmp(name,POSIX_MAPPER)==0){
     mapperInstance = new POSIXMapper();
   }
-  else if(name == MPIIO_MAPPER){
+  else if(strcmp(name,MPIIO_MAPPER)==0){
     mapperInstance = new MPIIOMapper();
   }
-  else if(name == HDF5_MAPPER){
+  else if(strcmp(name,HDF5_MAPPER)==0){
     mapperInstance = new HDF5Mapper();
   }
-  else if(name == PNETCDF_MAPPER){
+  else if(strcmp(name,PNETCDF_MAPPER)==0){
     mapperInstance = new PNETCDFMapper();
   }
   else if(name == S3_MAPPER){

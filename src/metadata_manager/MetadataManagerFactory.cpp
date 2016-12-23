@@ -28,22 +28,22 @@ std::shared_ptr<MetadataManagerFactory> MetadataManagerFactory::getInstance() {
 std::shared_ptr<IrisMetadataManager>
 MetadataManagerFactory::getMetadataManager(const char *name) {
   IrisMetadataManager* metadataManagerInstance = nullptr;
-  if(name == IRIS_METADATA_MANAGER){
+  if(strcmp(name,IRIS_METADATA_MANAGER)==0){
     metadataManagerInstance = new IrisMetadataManager();
   }
-  else if(name == POSIX_METADATA_MANAGER){
+  else if(strcmp(name,POSIX_METADATA_MANAGER)==0){
     metadataManagerInstance = new POSIXMetadataManager();
   }
-  else if(name == MPIIO_METADATA_MANAGER){
+  else if(strcmp(name,MPIIO_METADATA_MANAGER)==0){
     metadataManagerInstance = new MPIIOMetadataManager();
   }
-  else if(name == HDF5_METADATA_MANAGER){
+  else if(strcmp(name,HDF5_METADATA_MANAGER)==0){
     metadataManagerInstance = new HDF5MetadataManager();
   }
-  else if(name == PNETCDF_METADATA_MANAGER){
+  else if(strcmp(name,PNETCDF_METADATA_MANAGER)==0){
     metadataManagerInstance = new PNETCDFMetadataManager();
   }
-  else if(name == S3_METADATA_MANAGER){
+  else if(strcmp(name,S3_METADATA_MANAGER)==0){
     metadataManagerInstance = new S3MetadataManager();
   }
   else return nullptr;
