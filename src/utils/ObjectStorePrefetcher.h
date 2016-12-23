@@ -16,12 +16,13 @@
 
 class ObjectStorePrefetcher: public AbstractPrefetcher{
 private:
-  std::shared_ptr<ObjectStoreFactory> objectStoreFactory=ObjectStoreFactory::getInstance();
-  std::shared_ptr<CacheManager> cacheManager=CacheManager::getInstance();
-  std::shared_ptr<MapperFactory> mapperFactory=MapperFactory::getInstance();;
+  std::shared_ptr<ObjectStoreFactory> objectStoreFactory;
+  std::shared_ptr<CacheManager> cacheManager;
+  std::shared_ptr<MapperFactory> mapperFactory;
   int engine(const char * fileName, size_t &fileOffset, size_t &operationSize,int prefetchingMode);
 public:
-  int fetch(const char *fileName, size_t fileOffset, size_t operationSize);
+    ObjectStorePrefetcher();
+    int fetch(const char *fileName, size_t fileOffset, size_t operationSize);
 };
 
 

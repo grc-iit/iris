@@ -24,3 +24,9 @@ int ObjectStorePrefetcher::fetch(const char *fileName, size_t fileOffset, size_t
 int ObjectStorePrefetcher::engine(const char *fileName, size_t &fileOffset, size_t &operationSize, int prefetchingMode) {
   return OPERATION_SUCCESSUL;
 }
+
+ObjectStorePrefetcher::ObjectStorePrefetcher() {
+  objectStoreFactory=ObjectStoreFactory::getInstance();
+  cacheManager=CacheManager::getInstance();
+  mapperFactory=MapperFactory::getInstance();
+}

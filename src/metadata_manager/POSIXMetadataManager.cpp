@@ -129,6 +129,12 @@ size_t POSIXMetadataManager::getFpPosition(FILE *fh) {
   else return (size_t)index->second;
 }
 
+POSIXMetadataManager::POSIXMetadataManager(){
+    created_files=std::unordered_map<const char *,POSIXMetadataManager::Stat>();
+    fh2filename=std::unordered_map<FILE *,const char *>();
+    pointer=std::unordered_map<FILE *,long int>();
+}
+
 
 
 
