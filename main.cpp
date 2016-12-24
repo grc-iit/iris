@@ -78,16 +78,16 @@ int test3(){
   char * write_buf;
 
   size_t op_size = 50;
-  write_buf = "1111111111111111111122222222222222222222";
+  write_buf = "1111111111111111111122222222222222222222333333333333333333333333333333";
   char * read_buf = (char *)malloc(op_size);
   size_t bytes_read=0;
   size_t bytes_written =0;
 
   FILE* fh;
   fh = iris::fopen("file1.dat", "w");
-  iris::fwrite(write_buf, 1, 30, fh);
+  iris::fwrite(write_buf, 1, 50, fh);
   iris::fclose(fh);
   fh = iris::fopen("file1.dat", "r");
-  iris::fread(read_buf, 1, 30, fh);
+  iris::fread(read_buf, 1, 35, fh);
   return 0;
 }

@@ -108,13 +108,19 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
       posixMapper->generateKeys(filename, fileOffset, operationSize);
 
   Buffer buffer = Buffer(ptr);
+  size_t bufferIndex=0;
   for (auto&& key : keys) {
+    size_t originalKeySize=key.size;
     if(cacheManager->isCached(key) != OPERATION_SUCCESSUL){
       hyperdexClient->get(key);
     }
-    buffer.update(key.data,key.offset,key.size);
+    buffer.update(key.data,bufferIndex,originalKeySize);
+    bufferIndex+=originalKeySize;
   }
-  objectStorePrefetcher->fetch(filename, fileOffset, operationSize);
+#ifdef DEBUG
+  std::printf("Reading Data %-30s \n", ptr );
+#endif
+  //objectStorePrefetcher->fetch(filename, fileOffset, operationSize);
   posixMetadataManager->updateMetadataOnRead(stream, operationSize);
 #ifdef DEBUG
     std::cout << "Inside fread end" << std::endl;
