@@ -36,7 +36,7 @@ int HyperdexClient::get(Key &key) {
   op_id = hyperdex_client_get(hyperdexClient,
                               SPACE,
                               key.name,
-                              sizeof(key.name),
+                              strlen(key.name),
                               &op_status2,
                               &attributes,
                               &attributes_sz);
@@ -99,7 +99,7 @@ int HyperdexClient::put(Key &key) {
   op_id = hyperdex_client_put(hyperdexClient,
                               SPACE,
                               key.name,
-                              sizeof(key.name),
+                              strlen(key.name),
                               &attribute,
                               attributes_sz,
                               &op_status);
