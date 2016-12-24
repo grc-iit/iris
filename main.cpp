@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include "src/iris.h"
 
 char *randstring(size_t length) {
@@ -18,15 +19,19 @@ char *randstring(size_t length) {
   return randomString;
 }
 int test2();
-int basic();
+
+int read_after_write();
 int test3();
 int firstTest();
+
+int write_copy_read();
 int main(int argc, char *args[]) {
 
   std::cout << "Main" << std::endl;
   //firstTest();
-  //basic();
-  test3();
+  //read_after_write();
+  write_copy_read();
+  //test3();
   return 0;
 }
 int firstTest(){
@@ -35,23 +40,92 @@ int firstTest(){
   iris::fclose(fh);
   return 0;
 }
-int basic(){
+
+int read_after_write() {
   char * write_buf;
 
-  size_t op_size = 20;
+  size_t op_size = 20 * 1024 * 1024;//20971520
   write_buf = randstring(op_size);
-  char * read_buf = (char *)malloc(FILE_BUFFER_CAPACITY);
+  char *writebuf1 = (char *) "1";
+  char *read_buf = (char *) malloc(op_size);
   size_t bytes_read=0;
   size_t bytes_written =0;
 
   FILE* fh;
+  auto t1 = std::chrono::high_resolution_clock::now();
   fh = iris::fopen("file1.dat", "w");
-  iris::fwrite(write_buf, 1, 20, fh);
+  iris::fwrite(write_buf, 20, 1024 * 1024, fh);
+  //iris::fseek(fh, 5242880, SEEK_SET);
+  //iris::fwrite(write_buf, 10485760, 1, fh);
   iris::fclose(fh);
   fh = iris::fopen("file1.dat", "r");
-  iris::fread(read_buf, 1, 20, fh);
+  iris::fread(read_buf, 20, 1024 * 1024, fh);
   iris::fclose(fh);
+  auto t2 = std::chrono::high_resolution_clock::now();
+  std::cout << "IRIS() took "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(
+                t2 - t1).count()
+            << " milliseconds\n";
 
+
+  t1 = std::chrono::high_resolution_clock::now();
+  fh = std::fopen("/home/anthony/temp/file1.dat", "w");
+  std::fwrite(write_buf, 20, 1024 * 1024, fh);
+  //std::fseek(fh, 5242880, SEEK_SET);
+  //std::fwrite(write_buf, 10485760, 1, fh);
+  std::fclose(fh);
+  fh = std::fopen("/home/anthony/temp/file1.dat", "r");
+  std::fread(read_buf, 20, 1024 * 1024, fh);
+  std::fclose(fh);
+  t2 = std::chrono::high_resolution_clock::now();
+  std::cout << "POSIX() took "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(
+                t2 - t1).count()
+            << " milliseconds\n";
+  return 0;
+}
+
+int write_copy_read() {
+  char *write_buf;
+
+  size_t op_size = 1000 * 1024 * 1024;//20971520
+  write_buf = randstring(op_size);
+  char *writebuf1 = (char *) "1";
+  char *read_buf = (char *) malloc(op_size);
+  size_t bytes_read = 0;
+  size_t bytes_written = 0;
+
+  FILE *fh;
+  auto t1 = std::chrono::high_resolution_clock::now();
+  fh = iris::fopen("file1.dat", "w");
+  iris::fwrite(write_buf, 1000, 1024 * 1024, fh);
+  //iris::fseek(fh, 5242880, SEEK_SET);
+  //iris::fwrite(write_buf, 10485760, 1, fh);
+  iris::fclose(fh);
+  fh = iris::fopen("file1.dat", "r");
+  iris::fread(read_buf, 1000, 1024 * 1024, fh);
+  iris::fclose(fh);
+  auto t2 = std::chrono::high_resolution_clock::now();
+  std::cout << "IRIS() took "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(
+                t2 - t1).count()
+            << " milliseconds\n";
+
+
+  t1 = std::chrono::high_resolution_clock::now();
+  fh = std::fopen("/home/anthony/temp/file1.dat", "w");
+  std::fwrite(write_buf, 1000, 1024 * 1024, fh);
+  //std::fseek(fh, 5242880, SEEK_SET);
+  //std::fwrite(write_buf, 10485760, 1, fh);
+  std::fclose(fh);
+  fh = std::fopen("/home/anthony/temp/file1.dat", "r");
+  std::fread(read_buf, 1000, 1024 * 1024, fh);
+  std::fclose(fh);
+  t2 = std::chrono::high_resolution_clock::now();
+  std::cout << "POSIX() took "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(
+                t2 - t1).count()
+            << " milliseconds\n";
   return 0;
 }
 
@@ -65,6 +139,7 @@ int test2(){
   size_t bytes_written =0;
 
   FILE* fh;
+
   fh = iris::fopen("file1.dat", "w");
   iris::fwrite(write_buf, 1, 25, fh);
   iris::fclose(fh);

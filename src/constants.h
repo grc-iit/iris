@@ -57,7 +57,7 @@ struct Key{
 #define FILE_BUFFER_CAPACITY 1
 #define POSIX_MODE "STRICT" // "RELAXED"
 #define MAX_KEY_LENGTH 32
-#define MAX_OBJ_SIZE 20
+#define MAX_OBJ_SIZE (50*1024*1024)
 //Hyperdex parameters
 #define SPACE "IRIS_KEYSPACE"
 #define ATTRIBUTE_NAME "data"

@@ -1,3 +1,8 @@
 1) use const everywhere
 2) fix constants.h with constants
 3) error checking everywhere
+
+
+OPTIMIZATIONS
+-Mapper saves a map of collection of keys for a given range of offsets
+-

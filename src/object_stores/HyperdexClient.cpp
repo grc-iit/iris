@@ -50,7 +50,7 @@ int HyperdexClient::get(Key &key) {
     return HYPERDEX_GET_OPERATION_FAILED;
   }
 #ifdef DEBUG
-  std::printf("Getting Data \nkey Name : %s key Data %-30s \n", key.name,key.data );
+  std::printf("Getting Data \nkey Name : %s Data size %ld \n", key.name,key.size );
 #endif
 
     hyperdex_client_destroy_attrs(attributes,attributes_sz);
@@ -66,7 +66,8 @@ int HyperdexClient::put(Key &key) {
   Key originalKey=key;
   Buffer dataBuffer;
 #ifdef DEBUG
-    std::printf("Before Put Data \nkey Name : %s key Data %-30s \n", key.name,key.data );
+  //std::printf("Before Put Data \nkey Name : %s key Data %-30s \n", key
+    //.name,key.data );
 #endif
 
   if(key.offset==0){
@@ -111,7 +112,9 @@ int HyperdexClient::put(Key &key) {
     return HYPERDEX_PUT_OPERATION_FAILED;
   }
 #ifdef DEBUG
-    std::printf("after Put  Data \nkey Name : %s key Data %-30s \n", key.name,key.data );
+  //std::printf("after Put  Data \nkey Name : %s key Data %-30s \n", key
+    //.name,key.data );
+std::printf("Put  Data \nkey Name : %s data size: %ld\n", key.name, key.size);
 #endif
       return OPERATION_SUCCESSUL;
 }
