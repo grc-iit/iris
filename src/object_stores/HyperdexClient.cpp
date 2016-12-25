@@ -10,7 +10,7 @@ std::shared_ptr<HyperdexClient> HyperdexClient::instance = nullptr;
 *Constructors
 ******************************************************************************/
 HyperdexClient::HyperdexClient() {
-  if(init() != OPERATION_SUCCESSUL){
+  if(init() != OPERATION_SUCCESSFUL){
     fprintf(stderr,"Hyperdex failed to start! Please check the configuration of"
         " your Hyperdex installation and restart coordinator and daemon.\n");
     exit(-1);
@@ -61,7 +61,7 @@ int HyperdexClient::get(Key &key) {
   std::cout << "Key: " << key.name << "\t Data: " << key.data << std::endl;
 #endif /* DEBUG*/
   hyperdex_client_destroy_attrs(attributes,attributes_sz);
-  return OPERATION_SUCCESSUL;
+  return OPERATION_SUCCESSFUL;
 }
 
 int HyperdexClient::put(Key &key) {
@@ -76,7 +76,7 @@ int HyperdexClient::put(Key &key) {
   if(key.offset == 0){
     if(key.size != MAX_OBJ_SIZE){
       status = get(key);
-      if(status == OPERATION_SUCCESSUL && key.size > originalKey.size){
+      if(status == OPERATION_SUCCESSFUL && key.size > originalKey.size){
         dataBuffer = Buffer(key.data,key.size);
         dataBuffer.assign(originalKey.data, originalKey.size);
         key.data = dataBuffer.data();
@@ -84,7 +84,7 @@ int HyperdexClient::put(Key &key) {
     }
   }else{
     status = get(key);
-    if(status == OPERATION_SUCCESSUL) {
+    if(status == OPERATION_SUCCESSFUL) {
       if (key.size > originalKey.offset + originalKey.size){
         std::memcpy((char*)key.data + originalKey.offset, originalKey.data,
                     originalKey.size);
@@ -121,11 +121,11 @@ int HyperdexClient::put(Key &key) {
   std::cout << "Put operation complete" << std::endl;
   std::cout << "Key: " << key.name << "\t Data: " << key.data << std::endl;
 #endif /* DEBUG*/
-  return OPERATION_SUCCESSUL;
+  return OPERATION_SUCCESSFUL;
 }
 
 int HyperdexClient::remove(Key &key) {
-  return OPERATION_SUCCESSUL;
+  return OPERATION_SUCCESSFUL;
 }
 /******************************************************************************
 *Init function
@@ -184,7 +184,7 @@ int HyperdexClient::init() {
 #ifdef DEBUG
     printf("HyperDex client created.\n\n");
 #endif /* DEBUG*/
-  return OPERATION_SUCCESSUL;
+  return OPERATION_SUCCESSFUL;
 }
 
 

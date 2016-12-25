@@ -21,33 +21,54 @@ ObjectStorePrefetcher::~ObjectStorePrefetcher() {}
 *Interface
 ******************************************************************************/
 int ObjectStorePrefetcher::fetch(const char *fileName, long int fileOffset,
-                                 size_t operationSize, int prefetchingMode) {
+                                 size_t operationSize, long int fileSize) {
 #ifdef DEBUG
   std::cout << "Inside prefetcher start" << std::endl;
 #endif/*DEBUG*/
-  std::shared_ptr<POSIXMapper> posixMapper =
-      std::static_pointer_cast<POSIXMapper>
+  auto posixMapper = std::static_pointer_cast<POSIXMapper>
           (mapperFactory->getMapper(POSIX_MAPPER));
-  std::shared_ptr<HyperdexClient> objectStoreClient =
-      std::static_pointer_cast<HyperdexClient>
+  auto objectStoreClient = std::static_pointer_cast<HyperdexClient>
           (objectStoreFactory->getObjectStore(HYPERDEX_CLIENT));
 
-  int status = engine(fileName, fileOffset, operationSize, prefetchingMode);
-  std::vector<Key> keys = posixMapper->generateKeys(fileName, fileOffset,
-                                                    operationSize);
-  for (auto&& key:keys) {
-    objectStoreClient->get(key);
-    cacheManager->addToBuffer(key);
+  int status = engine(fileName, fileOffset, operationSize, fileSize,
+                      PREFETCH_MODE);
+  if(status == OPERATION_SUCCESSFUL){
+    auto keys = posixMapper->generateKeys(fileName, fileOffset, operationSize);
+    for (auto&& key:keys) {
+      objectStoreClient->get(key);
+      cacheManager->addDataToBuffer(key);
+    }
   }
+  else return FETCH_FAILED;
 #ifdef DEBUG
   std::cout << "Inside prefetcher end" << std::endl;
 #endif/*DEBUG*/
-  return OPERATION_SUCCESSUL;
+  return OPERATION_SUCCESSFUL;
 }
 
 int ObjectStorePrefetcher::engine(const char *fileName, long int &fileOffset,
-                                  size_t &operationSize, int prefetchingMode) {
-  return OPERATION_SUCCESSUL;
+                                  size_t &operationSize, long int fileSize,
+                                  int prefetchingMode) {
+  switch(prefetchingMode){
+    case SEQUENTIAL:
+      if(fileOffset+operationSize <= fileSize) fileOffset += operationSize;
+      else return PREFETCH_ENGINE_FAILED;
+      break;
+    case STRIDED:
+
+      break;
+    case RANDOM:
+      fileOffset = operationSize*rand()%(fileSize/operationSize+1);
+      if(fileOffset >= fileSize) return PREFETCH_ENGINE_FAILED;
+      break;
+    case USER_DEFINED:
+
+      break;
+    default:
+      fprintf(stderr, "Prefetch Mode is no valid!\n");
+      return PREFETCH_ENGINE_FAILED;
+  }
+  return OPERATION_SUCCESSFUL;
 }
 
 

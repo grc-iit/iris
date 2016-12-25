@@ -1,8 +1,7 @@
 How to start Hyperdex
 ################################################################################
 hyperdex coordinator -f -l 127.0.0.1 -p 1982
-hyperdex daemon -f --listen=127.0.0.1 --listen-port=2012 --coordinator=127.0.0.1
-                          --coordinator-port=1982 --data=/home/anthony/temp/data
+hyperdex daemon -f --listen=127.0.0.1 --listen-port=2012 --coordinator=127.0.0.1                          --coordinator-port=1982 --data=/home/anthony/temp/data
 ################################################################################
 
 OPTIMIZATIONS

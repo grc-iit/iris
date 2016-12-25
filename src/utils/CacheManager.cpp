@@ -6,7 +6,10 @@ std::shared_ptr<CacheManager> CacheManager::instance = nullptr;
 /******************************************************************************
 *Constructor
 ******************************************************************************/
-CacheManager::CacheManager() {}
+CacheManager::CacheManager() :cacheCapacity(CACHE_CAPACITY) {
+  cacheMap = HIPII();
+  lruList = LI();
+}
 /******************************************************************************
 *Destructor
 ******************************************************************************/
@@ -24,11 +27,33 @@ std::shared_ptr<CacheManager> CacheManager::getInstance() {
 *Functions
 ******************************************************************************/
 int CacheManager::isCached(Key &key) {
-  return CACHE_MANAGER_NO_DATA_FOUND;
+  auto cacheline = cacheMap.find(key.name);
+  if(cacheline == cacheMap.end()) return NO_DATA_FOUND;
+  refreshLRU(cacheline);
+  key.data = cacheline->second.first;
+  return OPERATION_SUCCESSFUL;
 }
 
-int CacheManager::addToBuffer(Key &key) {
-  return OPERATION_SUCCESSUL;
+int CacheManager::addDataToBuffer(Key &key) {
+  auto cacheline = cacheMap.find(key.name);
+  if (cacheline != cacheMap.end()) refreshLRU(cacheline);
+  else {
+    if (cacheMap.size() == cacheCapacity) {
+      cacheMap.erase(lruList.back());
+      lruList.pop_back();
+    }
+    lruList.push_front(key.name);
+  }
+  cacheMap[key.name] = { key.data, lruList.begin() };
+  return OPERATION_SUCCESSFUL;
+}
+
+void CacheManager::refreshLRU(std::unordered_map<const char *,
+    std::pair<void *, std::_List_iterator<const char *>>>::iterator cacheline) {
+  const char * key = cacheline->first;
+  lruList.erase(cacheline->second.second);
+  lruList.push_front(key);
+  cacheline->second.second = lruList.begin();
 }
 
 

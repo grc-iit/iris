@@ -15,7 +15,11 @@
 ******************************************************************************/
 #include <memory>
 #include <vector>
+#include <unordered_map>
+#include <list>
 #include "../constants.h"
+#include "Buffer.h"
+
 /******************************************************************************
 *Class
 ******************************************************************************/
@@ -25,11 +29,18 @@ private:
 *Variables and members
 ******************************************************************************/
   static std::shared_ptr<CacheManager> instance;
+  int cacheCapacity;
+  typedef std::list<const char *> LI;
+  typedef std::pair<void *, LI::iterator> PII;
+  typedef std::unordered_map<const char *, PII> HIPII;
+  HIPII cacheMap;
+  LI lruList;
+
+  void refreshLRU(HIPII::iterator cacheline);
 /******************************************************************************
-*Constructors
+*Constructor
 ******************************************************************************/
   CacheManager();
-
 public:
 /******************************************************************************
 *Getters and setters
@@ -39,7 +50,7 @@ public:
 *Functions
 ******************************************************************************/
   int isCached(Key &key);
-  int addToBuffer(Key &key);
+  int addDataToBuffer(Key &key);
 /******************************************************************************
 *Destructor
 ******************************************************************************/

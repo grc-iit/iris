@@ -41,10 +41,7 @@ private:
   std::unordered_map<FILE *, const char *> fh2filename;
   /*file position for every file handler that is opened*/
   std::unordered_map<FILE *, long int> pointer;
-/******************************************************************************
-*Functions
-******************************************************************************/
-  long int getFilesize(const char * filename);
+
 public:
 /******************************************************************************
 *Constructor
@@ -56,6 +53,7 @@ public:
   bool checkIfFileExists(const char *filename);
   bool checkIfFileIsOpen(const char *filename);
   const char * getFilename(FILE *fh);
+  long int getFilesize(const char * filename);
   int createMetadata(FILE * fh, const char * filename, const char* mode);
   int updateMetadataOnOpen(FILE * fh, const char * filename, const char* mode);
   int updateMetadataOnClose(FILE * fh, const char * filename);

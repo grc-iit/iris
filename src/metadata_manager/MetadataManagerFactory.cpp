@@ -1,7 +1,6 @@
-//
-// Created by anthony on 12/10/16.
-//
-
+/******************************************************************************
+*include files
+******************************************************************************/
 #include "MetadataManagerFactory.h"
 #include "../constants.h"
 #include "POSIXMetadataManager.h"
@@ -13,12 +12,20 @@
 *Initialization of static
 ******************************************************************************/
 std::shared_ptr<MetadataManagerFactory> MetadataManagerFactory::instance = nullptr;
-
+/******************************************************************************
+*Constructor
+******************************************************************************/
 MetadataManagerFactory::MetadataManagerFactory() {
-  metadataManagerMap = std::unordered_map<const char*, std::shared_ptr<IrisMetadataManager>>();
+  metadataManagerMap =
+      std::unordered_map<const char*, std::shared_ptr<IrisMetadataManager>>();
 }
+/******************************************************************************
+*Destructor
+******************************************************************************/
 MetadataManagerFactory::~MetadataManagerFactory() {}
-
+/******************************************************************************
+*Getters and setters
+******************************************************************************/
 std::shared_ptr<MetadataManagerFactory> MetadataManagerFactory::getInstance() {
   if(instance == nullptr){
     instance =
@@ -29,8 +36,7 @@ std::shared_ptr<MetadataManagerFactory> MetadataManagerFactory::getInstance() {
 
 std::shared_ptr<IrisMetadataManager>
 MetadataManagerFactory::getMetadataManager(const char *name) {
-  std::unordered_map<const char*, std::shared_ptr<IrisMetadataManager>>::const_iterator iter =
-          metadataManagerMap.find(name);
+  auto iter = metadataManagerMap.find(name);
   if(iter != metadataManagerMap.end()){
     return iter->second;
   }
@@ -49,7 +55,8 @@ MetadataManagerFactory::getMetadataManager(const char *name) {
     } else if (strcmp(name, S3_METADATA_MANAGER) == 0) {
       metadataManagerInstance = new S3MetadataManager();
     } else return nullptr;
-    std::shared_ptr<IrisMetadataManager> pointerMetadataManagerInstance=std::shared_ptr<IrisMetadataManager>(metadataManagerInstance);
+    auto pointerMetadataManagerInstance=std::shared_ptr<IrisMetadataManager>
+        (metadataManagerInstance);
     metadataManagerMap.emplace(name,pointerMetadataManagerInstance);
     return pointerMetadataManagerInstance;
   }

@@ -105,7 +105,70 @@ int local_tests::read_after_write(size_t writeMB, size_t readMB) {
   if(read_buf!= nullptr) free(read_buf);
   return 0;
 }
+int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
+  std::cout << "MR (Multiple Reads TEST\n" <<std::endl;
+  size_t op_size;
+  writeMB >= readMB ? op_size = writeMB * 1024 * 1024
+                    : op_size = readMB * 1024 * 1024;
+  char * write_buf = randstring(op_size);
+  char *read_buf = (char *) malloc(op_size);
 
+  FILE* fh;
+  size_t bytes_read=0;
+  size_t bytes_written =0;
+
+//IRIS
+  fh = iris::fopen("/home/anthony/temp/file1.dat", "w");
+  bytes_written = iris::fwrite(write_buf, sizeof(char), writeMB*1024*1024, fh);
+  bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
+                     : std::cout<<"Bytes written: " << bytes_written << std::endl;
+  iris::fclose(fh);
+
+  fh = iris::fopen("/home/anthony/temp/file1.dat", "r");
+  auto t1 = std::chrono::high_resolution_clock::now();
+  for(size_t i=0; i< writeMB; ++i){
+    bytes_read += iris::fread(read_buf, sizeof(char), readMB*1024*1024, fh);
+    iris::fseek(fh, 0, SEEK_SET);
+  }
+  auto t2 = std::chrono::high_resolution_clock::now();
+  bytes_read == 0 ? std::cout <<"File read failed!" <<std::endl
+                  : std::cout<<"Bytes read: " << bytes_read << std::endl;
+  std::cout << "IRIS() took "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(
+                t2 - t1).count()
+            << " milliseconds\n\n";
+  iris::fclose(fh);
+
+//POSIX
+  bytes_read =0;
+  bytes_written =0;
+  fh = std::fopen("/home/anthony/temp/file1.dat", "w");
+  bytes_written = std::fwrite(write_buf, sizeof(char), writeMB * 1024 * 1024, fh);
+  bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
+                     : std::cout<<"Bytes written: " << bytes_written <<
+                                std::endl;
+  std::fclose(fh);
+
+  fh = std::fopen("/home/anthony/temp/file1.dat", "r");
+  t1 = std::chrono::high_resolution_clock::now();
+  for(size_t i=0; i< writeMB; ++i){
+    bytes_read += std::fread(read_buf, sizeof(char), readMB*1024*1024,fh);
+    std::fseek(fh, 0, SEEK_SET);
+  }
+  t2 = std::chrono::high_resolution_clock::now();
+  bytes_read == 0 ? std::cout <<"File read failed!" <<std::endl
+                  : std::cout<<"Bytes read: " << bytes_read << std::endl;
+  std::cout << "POSIX() took "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(
+                t2 - t1).count()
+            << " milliseconds\n\n";
+
+  std::fclose(fh);
+
+  if(write_buf != nullptr) free(write_buf);
+  if(read_buf!= nullptr) free(read_buf);
+  return 0;
+}
 char *local_tests::randstring(std::size_t length) {
   int n;
   static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-#'?!";
@@ -122,3 +185,5 @@ char *local_tests::randstring(std::size_t length) {
   }
   return randomString;
 }
+
+

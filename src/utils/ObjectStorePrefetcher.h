@@ -35,7 +35,7 @@ private:
 *Functions
 ******************************************************************************/
   int engine(const char * fileName, long int &fileOffset, size_t &operationSize,
-             int prefetchingMode);
+             long int fileSize, int prefetchingMode);
 public:
 /******************************************************************************
 *Constructor
@@ -49,7 +49,7 @@ public:
 *Interface
 ******************************************************************************/
   int fetch(const char *fileName, long int fileOffset, size_t operationSize,
-            int prefetchingMode);
+            long int fileSize);
 };
 
 

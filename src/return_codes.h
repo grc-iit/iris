@@ -6,7 +6,7 @@
 #define IRIS_RETURN_CODES_H
 
 typedef enum iris_return_codes{
-  OPERATION_SUCCESSUL                = 7777,
+  OPERATION_SUCCESSFUL               = 7777,
 
   /* Error codes*/
   METADATA_CREATION_FAILED           = 7800,
@@ -17,13 +17,15 @@ typedef enum iris_return_codes{
   METADATA_UPDATE_FAILED__READ       = 7805,
   METADATA_UPDATE_FAILED__WRITE      = 7806,
   UPDATE_FILE_POINTER_FAILED         = 7807,
+  PREFETCH_ENGINE_FAILED             = 7808,
+  FETCH_FAILED                       = 7809,
 
 
   HYPERDEX_ADMIN_CREATION_FAILED     = 7900,
   HYPERDEX_CLIENT_CREATION_FAILED    = 7901,
   HYPERDEX_GET_OPERATION_FAILED      = 7902,
   HYPERDEX_PUT_OPERATION_FAILED      = 7903,
-  CACHE_MANAGER_NO_DATA_FOUND        = 7950
+  NO_DATA_FOUND                      = 7950
 
 } iris_returncode;
 

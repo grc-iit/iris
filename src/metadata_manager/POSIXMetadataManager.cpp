@@ -27,9 +27,8 @@ bool POSIXMetadataManager::checkIfFileExists(const char * filename) {
     exit(-1);
   }
   /* Check if the filename exists in the map of the created files*/
-  std::unordered_map<const char *, Stat>::const_iterator
-      fileIterator = created_files.find(filename);
-  return !(fileIterator == created_files.end());
+  auto iterator = created_files.find(filename);
+  return !(iterator == created_files.end());
 }
 
 bool POSIXMetadataManager::checkIfFileIsOpen(const char *filename) {
@@ -40,9 +39,8 @@ bool POSIXMetadataManager::checkIfFileIsOpen(const char *filename) {
   }
   if(checkIfFileExists(filename)) {
     /* Check if the file has been previously been opened*/
-    std::unordered_map<const char *, Stat>::const_iterator
-        fileIterator = created_files.find(filename);
-    if (fileIterator == created_files.end()) return false;
+    auto iterator = created_files.find(filename);
+    if (iterator == created_files.end()) return false;
     return created_files[filename].opened;
   }
   else{
@@ -56,8 +54,7 @@ bool POSIXMetadataManager::checkIfFileIsOpen(const char *filename) {
 
 const char *POSIXMetadataManager::getFilename(FILE *fh) {
   if(fh == nullptr) return nullptr;
-  std::unordered_map<FILE *, const char *>::const_iterator iterator =
-      fh2filename.find(fh);
+  auto iterator = fh2filename.find(fh);
   if(iterator == fh2filename.end()) return nullptr;
   else return iterator->second; //holds the filename
 }
@@ -69,13 +66,26 @@ int POSIXMetadataManager::createMetadata(FILE * fh, const char * filename,
     return METADATA_CREATION_FAILED;
   Stat file_metadata;
   if(strcmp(POSIX_MODE,"STRICT")==0)
-    file_metadata = {true, mode, getuid(), getgid(), 0, time(NULL), time(NULL),
+    file_metadata = {true,
+                     mode,
+                     getuid(),
+                     getgid(),
+                     0,
+                     time(NULL),
+                     time(NULL),
                      time(NULL)};
-  else file_metadata = {true, mode, 0, 0, 0, 0, 0, 0};
+  else file_metadata = {true,
+                        mode,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0};
   created_files.insert(std::make_pair(filename,file_metadata));
   fh2filename.insert(std::make_pair(fh, filename));
   pointer.insert(std::make_pair(fh,0));
-  return OPERATION_SUCCESSUL;
+  return OPERATION_SUCCESSFUL;
 }
 
 int POSIXMetadataManager::updateMetadataOnOpen(FILE * fh, const char * filename,
@@ -84,15 +94,25 @@ int POSIXMetadataManager::updateMetadataOnOpen(FILE * fh, const char * filename,
   if(fh == nullptr || std::strlen(filename) > MAX_FILENAME_LENGTH)
     return METADATA_UPDATE_FAILED__OPEN;
   if(strcmp(POSIX_MODE,"STRICT")==0)
-  created_files[filename] = {true, mode, created_files[filename].st_uid, created_files[filename].st_gid,
-                             created_files[filename].st_size, time(NULL),
+  created_files[filename] = {true,
+                             mode,
+                             created_files[filename].st_uid,
+                             created_files[filename].st_gid,
+                             created_files[filename].st_size,
+                             time(NULL),
                              created_files[filename].mtime,
                              created_files[filename].ctime};
-  else created_files[filename] = {true, mode, 0, 0,
-                                  created_files[filename].st_size, 0, 0, 0};
+  else created_files[filename] = {true,
+                                  mode,
+                                  0,
+                                  0,
+                                  created_files[filename].st_size,
+                                  0,
+                                  0,
+                                  0};
   fh2filename.insert(std::make_pair(fh, filename));
   pointer.insert(std::make_pair(fh,0));
-  return OPERATION_SUCCESSUL;
+  return OPERATION_SUCCESSFUL;
 }
 
 int POSIXMetadataManager::updateMetadataOnClose(FILE * fh, const char * filename) {
@@ -106,7 +126,7 @@ int POSIXMetadataManager::updateMetadataOnClose(FILE * fh, const char * filename
   else created_files[filename].opened = false;
   fh2filename.erase(fh);
   pointer.erase(fh);
-  return OPERATION_SUCCESSUL;
+  return OPERATION_SUCCESSFUL;
 }
 
 int POSIXMetadataManager::updateMetadataOnRead(FILE *fh, std::size_t operationSize) {
@@ -116,7 +136,7 @@ int POSIXMetadataManager::updateMetadataOnRead(FILE *fh, std::size_t operationSi
   if(filename == nullptr) return FILENAME_DOES_NOT_EXIST;
   if(strcmp(POSIX_MODE,"STRICT")==0) created_files[filename].atime = time(NULL);
   updateFpPosition(fh, operationSize, SEEK_CUR);
-  return OPERATION_SUCCESSUL;
+  return OPERATION_SUCCESSFUL;
 }
 
 int POSIXMetadataManager::updateMetadataOnWrite(FILE *fh,
@@ -134,14 +154,13 @@ int POSIXMetadataManager::updateMetadataOnWrite(FILE *fh,
       fileOffset + operationSize > created_files[filename].st_size
       ? fileOffset + operationSize : created_files[filename].st_size;
   updateFpPosition(fh, operationSize, SEEK_CUR);
-  return OPERATION_SUCCESSUL;
+  return OPERATION_SUCCESSFUL;
 }
 
 int POSIXMetadataManager::updateFpPosition(FILE *fh, long int offset,
                                            int origin) {
   if(fh == nullptr) return UPDATE_FILE_POINTER_FAILED;
-  std::unordered_map<FILE *, long int>::const_iterator index =
-      pointer.find(fh);
+  auto index = pointer.find(fh);
   if(index == pointer.end()) return UPDATE_FILE_POINTER_FAILED;
 
   const char * filename = getFilename(fh);
@@ -166,13 +185,12 @@ int POSIXMetadataManager::updateFpPosition(FILE *fh, long int offset,
       fprintf(stderr, "Seek origin fault!\n");
       return UPDATE_FILE_POINTER_FAILED;
   }
-  return OPERATION_SUCCESSUL;
+  return OPERATION_SUCCESSFUL;
 }
 
 long int POSIXMetadataManager::getFpPosition(FILE *fh) {
   if(fh == nullptr) return -1;
-  std::unordered_map<FILE *, long int>::const_iterator index =
-      pointer.find(fh);
+  auto index = pointer.find(fh);
   if(index == pointer.end()) return -1;
   else return index->second; //holds the offset
 }
@@ -183,10 +201,9 @@ long int POSIXMetadataManager::getFpPosition(FILE *fh) {
 long int POSIXMetadataManager::getFilesize(const char *filename) {
   if(!checkIfFileExists(filename) || std::strlen(filename) > MAX_FILENAME_LENGTH)
     return -1;
-  std::unordered_map<const char *, Stat>::const_iterator fileIterator
-      = created_files.find(filename);
-  if(fileIterator == created_files.end()) return -1;
-  return fileIterator->second.st_size;
+  auto iterator = created_files.find(filename);
+  if(iterator == created_files.end()) return -1;
+  return iterator->second.st_size;
 }
 
 
