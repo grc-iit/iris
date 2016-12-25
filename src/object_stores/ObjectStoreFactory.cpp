@@ -1,18 +1,20 @@
-//
-// Created by anthony on 12/10/16.
-//
-
 #include "ObjectStoreFactory.h"
 #include "HyperdexClient.h"
 /******************************************************************************
 *Initialization of static
 ******************************************************************************/
 std::shared_ptr<ObjectStoreFactory> ObjectStoreFactory::instance = nullptr;
-
+/******************************************************************************
+*Constructors
+******************************************************************************/
 ObjectStoreFactory::ObjectStoreFactory() {}
-
+/******************************************************************************
+*Destructor
+******************************************************************************/
 ObjectStoreFactory::~ObjectStoreFactory() {}
-
+/******************************************************************************
+*Getters and setters
+******************************************************************************/
 std::shared_ptr<ObjectStoreFactory> ObjectStoreFactory::getInstance() {
   if (instance == nullptr) {
     instance = std::shared_ptr<ObjectStoreFactory>(new ObjectStoreFactory());

@@ -34,8 +34,6 @@
 #include "metadata_manager/PNETCDFMetadataManager.h"
 #include "metadata_manager/S3MetadataManager.h"
 #include "object_stores/ObjectStoreFactory.h"
-
-
 /******************************************************************************
 *Class
 ******************************************************************************/
@@ -50,13 +48,15 @@ private:
   std::shared_ptr<MetadataManagerFactory> metadataManagerFactory;
   std::shared_ptr<MapperFactory> mapperFactory;
   std::shared_ptr<ObjectStoreFactory> objectStoreFactory;
-
 /******************************************************************************
 *Constructors
 ******************************************************************************/
   API();
-
 public:
+/******************************************************************************
+*Destructor
+******************************************************************************/
+  virtual ~API();
 /******************************************************************************
 *Getters and setters
 ******************************************************************************/
@@ -81,6 +81,7 @@ public:
   std::shared_ptr<ObjectStoreFactory> getObjectStoreFactory() {
     return objectStoreFactory;
   }
+
 };
 
 #endif //IRIS_ABSTRACTAPI_H

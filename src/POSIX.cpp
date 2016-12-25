@@ -14,7 +14,7 @@
 ******************************************************************************/
 FILE *iris::fopen(const char *filename, const char *mode) {
 #ifdef DEBUG
-    std::cout << "Inside fopen start" << std::endl;
+  std::cout << "Inside fopen start" << std::endl;
 #endif/*DEBUG*/
   std::shared_ptr<API> apiInstance = API::getInstance();
   std::shared_ptr<POSIXMetadataManager> posixMetadataManager =
@@ -47,7 +47,7 @@ FILE *iris::fopen(const char *filename, const char *mode) {
     posixMetadataManager->createMetadata(fh, filename, mode);
   }
 #ifdef DEBUG
-    std::cout << "Inside fopen end" << std::endl;
+  std::cout << "Inside fopen end" << std::endl;
 #endif/*DEBUG*/
   return fh;
 }
@@ -68,7 +68,7 @@ int iris::fclose(FILE *stream) {
     posixMetadataManager->updateMetadataOnClose(stream, filename);
   }
 #ifdef DEBUG
-    std::cout << "Inside fclose end" << std::endl;
+  std::cout << "Inside fclose end" << std::endl;
 #endif/*DEBUG*/
   return 0;
 }
@@ -94,16 +94,19 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
       std::static_pointer_cast<POSIXMetadataManager>(apiInstance->
           getMetadataManagerFactory()->getMetadataManager(POSIX_METADATA_MANAGER));
   std::shared_ptr<POSIXMapper> posixMapper =
-      std::static_pointer_cast<POSIXMapper>(apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER));
+      std::static_pointer_cast<POSIXMapper>
+          (apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER));
   std::shared_ptr<CacheManager> cacheManager = apiInstance->getCacheManager();
   std::shared_ptr<ObjectStorePrefetcher> objectStorePrefetcher =
-      std::static_pointer_cast<ObjectStorePrefetcher>(apiInstance->getPrefetcherFactory()->getPrefetcher(OBJECTSTORE_PREFETCHER));
-  std::shared_ptr<HyperdexClient> hyperdexClient =
-      std::static_pointer_cast<HyperdexClient>(apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT));
+      std::static_pointer_cast<ObjectStorePrefetcher>
+          (apiInstance->getPrefetcherFactory()->getPrefetcher(OBJECTSTORE_PREFETCHER));
+  std::shared_ptr<HyperdexClient> objectStoreClient =
+      std::static_pointer_cast<HyperdexClient>
+          (apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT));
 
   std::size_t operationSize = size*count;
   const char * filename = posixMetadataManager->getFilename(stream);
-  std::size_t fileOffset = posixMetadataManager->getFpPosition(stream);
+  long int fileOffset = posixMetadataManager->getFpPosition(stream);
   std::vector<Key> keys =
       posixMapper->generateKeys(filename, fileOffset, operationSize);
 
@@ -112,7 +115,7 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
   for (auto&& key : keys) {
     size_t originalKeySize=key.size;
     if(cacheManager->isCached(key) != OPERATION_SUCCESSUL){
-      hyperdexClient->get(key);
+      objectStoreClient->get(key);
     }
     buffer.update(key.data,bufferIndex,originalKeySize);
     bufferIndex+=originalKeySize;
@@ -120,10 +123,10 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
 #ifdef DEBUG
   std::printf("Reading Data %-30s \n", ptr );
 #endif
-  //objectStorePrefetcher->fetch(filename, fileOffset, operationSize);
+  objectStorePrefetcher->fetch(filename, fileOffset, operationSize, SEQUENTIAL);
   posixMetadataManager->updateMetadataOnRead(stream, operationSize);
 #ifdef DEBUG
-    std::cout << "Inside fread end" << std::endl;
+  std::cout << "Inside fread end" << std::endl;
 #endif/*DEBUG*/
   return operationSize;
 }
@@ -131,37 +134,37 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
 *fwrite
 ******************************************************************************/
 size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
-  /*TODO: error checking
-   * operation size
-   * is fh valid or opened?
-   *
-   */
-  std::cout << "IRIS FWRITE HERE!!!!!!" << std::endl;
+  std::size_t operationSize = size * count;
+  if(operationSize == 0) return 0;
+
   std::shared_ptr<API> apiInstance = API::getInstance();
   std::shared_ptr<POSIXMetadataManager> posixMetadataManager =
       std::static_pointer_cast<POSIXMetadataManager>(apiInstance->
           getMetadataManagerFactory()->getMetadataManager(POSIX_METADATA_MANAGER));
   std::shared_ptr<POSIXMapper> posixMapper =
-      std::static_pointer_cast<POSIXMapper>(apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER));
-  std::shared_ptr<HyperdexClient> hyperdexClient =
-      std::static_pointer_cast<HyperdexClient>(apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT));
+      std::static_pointer_cast<POSIXMapper>
+          (apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER));
+  std::shared_ptr<HyperdexClient> objectStoreClient =
+      std::static_pointer_cast<HyperdexClient>
+          (apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT));
 
-  std::size_t operationSize = size * count;
   const char *filename = posixMetadataManager->getFilename(stream);
-  std::size_t fileOffset = posixMetadataManager->getFpPosition(stream);
+  if(!posixMetadataManager->checkIfFileIsOpen(filename)) return 0;
+
+  long int fileOffset = posixMetadataManager->getFpPosition(stream);
 
   std::vector<Key> keys =
       posixMapper->generateKeys(filename, fileOffset, operationSize);
-    std::size_t bufferIndex = 0;
+  std::size_t bufferIndex = 0;
   for (auto &&key : keys) {
     key.data=malloc(key.size);
     memcpy(key.data,(char*)ptr + bufferIndex,key.size);
-    hyperdexClient->put(key);
+    objectStoreClient->put(key);
     bufferIndex += key.size;
   }
   posixMetadataManager->updateMetadataOnWrite(stream, operationSize);
 #ifdef DEBUG
-    std::cout << "Inside fwrite end" << std::endl;
+  std::cout << "Inside fwrite end" << std::endl;
 #endif/*DEBUG*/
   return operationSize;
 }

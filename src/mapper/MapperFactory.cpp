@@ -10,7 +10,7 @@
 #include "S3Mapper.h"
 
 /******************************************************************************
-*Initialization of static
+*Initialization of static members
 ******************************************************************************/
 std::shared_ptr<MapperFactory> MapperFactory::instance = nullptr;
 /******************************************************************************

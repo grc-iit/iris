@@ -7,6 +7,7 @@
 *Constructors
 ******************************************************************************/
 Buffer::Buffer(void *data)
+    : free_(false)
 {
   if(data != nullptr) data_ = (char *) data;
 }
@@ -87,8 +88,7 @@ Buffer::Buffer(const Buffer& x)
 ******************************************************************************/
 Buffer::~Buffer()
 {
-  if(free_)
-    delete[] data_;
+  if(free_) delete[] data_;
 }
 /******************************************************************************
 *Interface

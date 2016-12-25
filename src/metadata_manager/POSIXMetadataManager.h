@@ -1,18 +1,30 @@
-//
-// Created by anthony on 12/10/16.
-//
-
+/*******************************************************************************
+* File POSIXMetadataManager.h
+*
+* Goal:
+*
+* Created: December 10th, 2016  - Anthony Kougkas
+ * Updated:
+* Illinois Institute of Technology - SCS Lab
+* (C) 2016
+******************************************************************************/
 #ifndef IRIS_POSIXMETADATAMANAGER_H
 #define IRIS_POSIXMETADATAMANAGER_H
-
-
+/******************************************************************************
+*include files
+******************************************************************************/
 #include <unistd.h>
 #include <ctime>
 #include <unordered_map>
 #include "IrisMetadataManager.h"
-
+/******************************************************************************
+*Class
+******************************************************************************/
 class POSIXMetadataManager: public IrisMetadataManager {
 private:
+/******************************************************************************
+*Variables and members
+******************************************************************************/
   /*filename plus metadata information*/
   struct Stat {
     bool            opened;     /*flag if the file is opened*/
@@ -29,9 +41,18 @@ private:
   std::unordered_map<FILE *, const char *> fh2filename;
   /*file position for every file handler that is opened*/
   std::unordered_map<FILE *, long int> pointer;
+/******************************************************************************
+*Functions
+******************************************************************************/
   long int getFilesize(const char * filename);
 public:
+/******************************************************************************
+*Constructor
+******************************************************************************/
   POSIXMetadataManager();
+/******************************************************************************
+*Interface
+******************************************************************************/
   bool checkIfFileExists(const char *filename);
   bool checkIfFileIsOpen(const char *filename);
   const char * getFilename(FILE *fh);
@@ -41,10 +62,11 @@ public:
   int updateMetadataOnRead(FILE * fh, std::size_t operationSize);
   int updateMetadataOnWrite(FILE *fh, std::size_t operationSize);
   int updateFpPosition(FILE * fh, long int offset, int origin);
-  std::size_t getFpPosition(FILE * fh);
-
-
+  long int getFpPosition(FILE * fh);
+/******************************************************************************
+*Destructor
+******************************************************************************/
+  virtual ~POSIXMetadataManager();
 };
-
 
 #endif //IRIS_POSIXMETADATAMANAGER_H

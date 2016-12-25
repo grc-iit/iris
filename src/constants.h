@@ -10,37 +10,58 @@
 ******************************************************************************/
 #ifndef IRIS_CONSTANTS_H
 #define IRIS_CONSTANTS_H
-
-
+/******************************************************************************
+*include files
+******************************************************************************/
 #include <cstring>
+#include <sys/types.h>
 #include "return_codes.h"
+/******************************************************************************
+*Iris library parameters
+******************************************************************************/
+static const u_int16_t MAX_FILENAME_LENGTH = 256;
+static const u_int16_t FILE_BUFFER_CAPACITY = 1;
+static const char * POSIX_MODE = "RELAXED"; //"STRICT" - "RELAXED"
+static const u_int16_t MAX_KEY_LENGTH = 32;
+static const size_t MAX_OBJ_SIZE = (50*1024*1024);
 /******************************************************************************
 *Prefetcher
 ******************************************************************************/
-#define FILESYSTEM_PREFETCHER "FILESYSTEM_PREFETCHER"
-#define OBJECTSTORE_PREFETCHER "OBJECTSTORE_PREFETCHER"
+static const char * FILESYSTEM_PREFETCHER = "FILESYSTEM_PREFETCHER";
+static const char * OBJECTSTORE_PREFETCHER = "OBJECTSTORE_PREFETCHER";
+typedef enum prefetching_modes{
+  SEQUENTIAL    = 0,
+  STRIDED       = 1,
+  RANDOM        = 2,
+  USER_DEFINED  = 3
+} prefetch_mode;
 /******************************************************************************
 *Metadata Manager
 ******************************************************************************/
-#define IRIS_METADATA_MANAGER "IRIS_METADATA_MANAGER"
-#define POSIX_METADATA_MANAGER "POSIX_METADATA_MANAGER"
-#define MPIIO_METADATA_MANAGER "MPIIO_METADATA_MANAGER"
-#define HDF5_METADATA_MANAGER "HDF5_METADATA_MANAGER"
-#define PNETCDF_METADATA_MANAGER "PNETCDF_METADATA_MANAGER"
-#define S3_METADATA_MANAGER "S3_METADATA_MANAGER"
+static const char * IRIS_METADATA_MANAGER = "IRIS_METADATA_MANAGER";
+static const char * POSIX_METADATA_MANAGER = "POSIX_METADATA_MANAGER";
+static const char * MPIIO_METADATA_MANAGER = "MPIIO_METADATA_MANAGER";
+static const char * HDF5_METADATA_MANAGER = "HDF5_METADATA_MANAGER";
+static const char * PNETCDF_METADATA_MANAGER = "PNETCDF_METADATA_MANAGER";
+static const char * S3_METADATA_MANAGER = "S3_METADATA_MANAGER";
 /******************************************************************************
 *Mapper
 ******************************************************************************/
-#define POSIX_MAPPER "POSIX_MAPPER"
-#define MPIIO_MAPPER "MPIIO_MAPPER"
-#define HDF5_MAPPER "HDF5_MAPPER"
-#define PNETCDF_MAPPER "PNETCDF_MAPPER"
-#define S3_MAPPER "S3_MAPPER"
+static const char * POSIX_MAPPER ="POSIX_MAPPER";
+static const char * MPIIO_MAPPER ="MPIIO_MAPPER";
+static const char * HDF5_MAPPER = "HDF5_MAPPER";
+static const char * PNETCDF_MAPPER = "PNETCDF_MAPPER";
+static const char * S3_MAPPER = "S3_MAPPER";
 /******************************************************************************
 *Object Stores
 ******************************************************************************/
-#define HYPERDEX_CLIENT "HYPERDEX_CLIENT"
-
+static const char * HYPERDEX_CLIENT ="HYPERDEX_CLIENT";
+static const char * SPACE = "IRIS_KEYSPACE";
+static const char * ATTRIBUTE_NAME = "data";
+static const char * DESCRIPTION = "space IRIS_KEYSPACE key filename_chunk "
+    "attributes data";
+static const char * COORDINATOR  = "127.0.0.1";
+static const u_int16_t COORDINATOR_PORT = 1982;
 /******************************************************************************
 *Key structure
 ******************************************************************************/
@@ -50,22 +71,5 @@ struct Key{
     std::size_t size;
     void* data;
 };
-/******************************************************************************
-*Iris library parameters
-******************************************************************************/
-#define MAX_FILENAME_LENGTH 256
-#define FILE_BUFFER_CAPACITY 1
-#define POSIX_MODE "STRICT" // "RELAXED"
-#define MAX_KEY_LENGTH 32
-#define MAX_OBJ_SIZE (50*1024*1024)
-//Hyperdex parameters
-#define SPACE "IRIS_KEYSPACE"
-#define ATTRIBUTE_NAME "data"
-#define DESCRIPTION "space IRIS_KEYSPACE key offset attributes data"
-#define COORDINATOR  "127.0.0.1"
-#define COORDINATOR_PORT 1982
-
-
-
 
 #endif //IRIS_CONSTANTS_H

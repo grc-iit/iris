@@ -1,11 +1,18 @@
-//
-// Created by anthony on 12/10/16.
-//
-
+/*******************************************************************************
+* File ObjectStorePrefetcher.h
+*
+* Goal:
+*
+* Created: December 10th, 2016  - Anthony Kougkas
+ * Updated:
+* Illinois Institute of Technology - SCS Lab
+* (C) 2016
+******************************************************************************/
 #ifndef IRIS_OBJECTSTOREPREFETCHER_H
 #define IRIS_OBJECTSTOREPREFETCHER_H
-
-
+/******************************************************************************
+*include files
+******************************************************************************/
 #include "AbstractPrefetcher.h"
 #include "../constants.h"
 #include "../object_stores/HyperdexClient.h"
@@ -13,16 +20,36 @@
 #include "../mapper/MapperFactory.h"
 #include "CacheManager.h"
 #include <vector>
-
+/******************************************************************************
+*Class
+******************************************************************************/
 class ObjectStorePrefetcher: public AbstractPrefetcher{
 private:
+/******************************************************************************
+*Variables and members
+******************************************************************************/
   std::shared_ptr<ObjectStoreFactory> objectStoreFactory;
   std::shared_ptr<CacheManager> cacheManager;
   std::shared_ptr<MapperFactory> mapperFactory;
-  int engine(const char * fileName, size_t &fileOffset, size_t &operationSize,int prefetchingMode);
+/******************************************************************************
+*Functions
+******************************************************************************/
+  int engine(const char * fileName, long int &fileOffset, size_t &operationSize,
+             int prefetchingMode);
 public:
-    ObjectStorePrefetcher();
-    int fetch(const char *fileName, size_t fileOffset, size_t operationSize);
+/******************************************************************************
+*Constructor
+******************************************************************************/
+  ObjectStorePrefetcher();
+/******************************************************************************
+*Destructor
+******************************************************************************/
+  virtual ~ObjectStorePrefetcher();
+/******************************************************************************
+*Interface
+******************************************************************************/
+  int fetch(const char *fileName, long int fileOffset, size_t operationSize,
+            int prefetchingMode);
 };
 
 

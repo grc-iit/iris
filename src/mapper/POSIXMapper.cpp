@@ -1,14 +1,15 @@
-//
-// Created by anthony on 12/10/16.
-//
-
+/******************************************************************************
+*include files
+******************************************************************************/
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
 #include "POSIXMapper.h"
-
+/******************************************************************************
+*Functions
+******************************************************************************/
 std::vector<Key>
-POSIXMapper::generateKeys(const char *name, size_t offset, size_t size) {
+POSIXMapper::generateKeys(const char *name, long int offset, size_t size) {
   std::vector<Key> keys;
   std::size_t baseKey = offset/MAX_OBJ_SIZE;
   std::size_t remainingOperationSize=size;
@@ -16,7 +17,7 @@ POSIXMapper::generateKeys(const char *name, size_t offset, size_t size) {
     int keySize = sizeof(name)+sizeof(baseKey);
     Key key;
     while(remainingOperationSize!=0) {
-      key.name = (char *) std::malloc((std::size_t) keySize);
+      key.name = (char *) std::malloc(strlen(name));
       std::size_t baseOffset = ((baseKey + i) * MAX_OBJ_SIZE);
     std::sprintf(key.name, "%s_%ld", name, (baseKey + i));
     if (offset == baseOffset) {

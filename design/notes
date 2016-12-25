@@ -1,8 +1,15 @@
-1) use const everywhere
-2) fix constants.h with constants
-3) error checking everywhere
-
+How to start Hyperdex
+################################################################################
+hyperdex coordinator -f -l 127.0.0.1 -p 1982
+hyperdex daemon -f --listen=127.0.0.1 --listen-port=2012 --coordinator=127.0.0.1
+                          --coordinator-port=1982 --data=/home/anthony/temp/data
+################################################################################
 
 OPTIMIZATIONS
--Mapper saves a map of collection of keys for a given range of offsets
--
+################################################################################
+1) use const everywhere
+2) fix constants.h with constants (DONE)
+3) error checking everywhere
+4) Mapper saves a map of collection of keys for a given range of offsets
+5) Call by reference wherever possible
+################################################################################

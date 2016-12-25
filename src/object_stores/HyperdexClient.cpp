@@ -1,129 +1,135 @@
-//
-// Created by anthony on 12/10/16.
-//
-
 #include "HyperdexClient.h"
 #include "../utils/Buffer.h"
 #include <hyperdex/client.h>
 #include <hyperdex/admin.h>
-
 /******************************************************************************
 *Initialization of static
 ******************************************************************************/
 std::shared_ptr<HyperdexClient> HyperdexClient::instance = nullptr;
-
+/******************************************************************************
+*Constructors
+******************************************************************************/
 HyperdexClient::HyperdexClient() {
   if(init() != OPERATION_SUCCESSUL){
-    //TODO: throw exception here!
+    fprintf(stderr,"Hyperdex failed to start! Please check the configuration of"
+        " your Hyperdex installation and restart coordinator and daemon.\n");
+    exit(-1);
   }
 }
-
+/******************************************************************************
+*Destructor
+******************************************************************************/
 HyperdexClient::~HyperdexClient() {}
-
-
+/******************************************************************************
+*Getters and setters
+******************************************************************************/
 std::shared_ptr<HyperdexClient> HyperdexClient::getInstance() {
   if (instance == nullptr) {
     instance = std::shared_ptr<HyperdexClient>(new HyperdexClient());
   }
   return instance;
 }
-
+/******************************************************************************
+*Interface
+******************************************************************************/
 int HyperdexClient::get(Key &key) {
   int64_t op_id=0, loop_id=0;
   const struct hyperdex_client_attribute* attributes = 0;
   std::size_t attributes_sz = 0;
-  enum hyperdex_client_returncode op_status2, loop_status2;
+  enum hyperdex_client_returncode op_status, loop_status;
   op_id = hyperdex_client_get(hyperdexClient,
                               SPACE,
                               key.name,
                               strlen(key.name),
-                              &op_status2,
+                              &op_status,
                               &attributes,
                               &attributes_sz);
-  loop_id = hyperdex_client_loop(hyperdexClient, -1, &loop_status2);
-  if (op_id == loop_id && loop_status2 == HYPERDEX_CLIENT_SUCCESS && attributes_sz!=0){
-    //key.data = (void*) attributes[0].value;
+  loop_id = hyperdex_client_loop(hyperdexClient, -1, &loop_status);
+  if (op_id == loop_id && loop_status == HYPERDEX_CLIENT_SUCCESS && attributes_sz!=0){
     key.data=malloc(attributes[0].value_sz);
-    memcpy(key.data,attributes[0].value,attributes[0].value_sz);
+    memcpy(key.data, attributes[0].value, attributes[0].value_sz);
     key.size = attributes[0].value_sz;
   }else{
+#ifdef DEBUG
+    fprintf(stderr, "Get FAILED! \nOP ID: %ld, STAT: %d, LOOP ID: %ld, STAT:"
+        " %d\n", op_id, op_status, loop_id, loop_status);
+#endif /* DEBUG*/
     return HYPERDEX_GET_OPERATION_FAILED;
   }
 #ifdef DEBUG
-  std::printf("Getting Data \nkey Name : %s Data size %ld \n", key.name,key.size );
-#endif
-
-    hyperdex_client_destroy_attrs(attributes,attributes_sz);
+  std::cout << "Get operation complete" << std::endl;
+  std::cout << "Key: " << key.name << "\t Data: " << key.data << std::endl;
+#endif /* DEBUG*/
+  hyperdex_client_destroy_attrs(attributes,attributes_sz);
   return OPERATION_SUCCESSUL;
 }
 
 int HyperdexClient::put(Key &key) {
-  int status;
+  int status = 0;
   struct hyperdex_client_attribute attribute;
   enum hyperdex_client_returncode op_status, loop_status;
-  int64_t op_id=0, loop_id=0;
+  int64_t op_id = 0, loop_id = 0;
 
-  Key originalKey=key;
+  Key originalKey = key;
   Buffer dataBuffer;
-#ifdef DEBUG
-  //std::printf("Before Put Data \nkey Name : %s key Data %-30s \n", key
-    //.name,key.data );
-#endif
 
-  if(key.offset==0){
-    if(key.size!=MAX_OBJ_SIZE){
-      status=get(key);
-      if(status==OPERATION_SUCCESSUL && key.size > originalKey.size){
-        dataBuffer=Buffer(key.data,key.size);
-        dataBuffer.assign(originalKey.data,originalKey.size);
-        key.data=dataBuffer.data();
+  if(key.offset == 0){
+    if(key.size != MAX_OBJ_SIZE){
+      status = get(key);
+      if(status == OPERATION_SUCCESSUL && key.size > originalKey.size){
+        dataBuffer = Buffer(key.data,key.size);
+        dataBuffer.assign(originalKey.data, originalKey.size);
+        key.data = dataBuffer.data();
       }
     }
   }else{
-    status=get(key);
-    if(status==OPERATION_SUCCESSUL) {
-      if (key.size > originalKey.offset + originalKey.size) {
+    status = get(key);
+    if(status == OPERATION_SUCCESSUL) {
+      if (key.size > originalKey.offset + originalKey.size){
         std::memcpy((char*)key.data + originalKey.offset, originalKey.data,
                     originalKey.size);
       } else{
-        dataBuffer=Buffer(key.data,originalKey.offset);
+        dataBuffer = Buffer(key.data, originalKey.offset);
         dataBuffer.append(originalKey.data);
-        key.data=dataBuffer.data();
+        key.data = dataBuffer.data();
       }
     }
   }
-    std::size_t attributes_sz = 1;
+  /*Prepare parameters for th actual put call on Hyperdex*/
+  std::size_t attribute_sz = 1;
   attribute.attr =ATTRIBUTE_NAME;
+  attribute.datatype=HYPERDATATYPE_STRING;
   attribute.value = (const char *) key.data;
   attribute.value_sz = key.size;
-  attribute.datatype=HYPERDATATYPE_STRING;
+
   op_id = hyperdex_client_put(hyperdexClient,
                               SPACE,
                               key.name,
                               strlen(key.name),
                               &attribute,
-                              attributes_sz,
+                              attribute_sz,
                               &op_status);
-    loop_id = hyperdex_client_loop(hyperdexClient, -1, &loop_status);
+  loop_id = hyperdex_client_loop(hyperdexClient, -1, &loop_status);
   if (loop_id != op_id || loop_status != HYPERDEX_CLIENT_SUCCESS) {
 #ifdef DEBUG
-    std::cout<< HYPERDEX_PUT_OPERATION_FAILED << " Hyperdex put status " << loop_status << std::endl;
-#endif
+    fprintf(stderr, "PUT FAILED! \nOP ID: %ld, STAT: %d, LOOP ID: %ld, STAT:"
+        " %d\n", op_id, op_status, loop_id, loop_status);
+#endif /* DEBUG*/
     return HYPERDEX_PUT_OPERATION_FAILED;
   }
 #ifdef DEBUG
-  //std::printf("after Put  Data \nkey Name : %s key Data %-30s \n", key
-    //.name,key.data );
-std::printf("Put  Data \nkey Name : %s data size: %ld\n", key.name, key.size);
-#endif
-      return OPERATION_SUCCESSUL;
+  std::cout << "Put operation complete" << std::endl;
+  std::cout << "Key: " << key.name << "\t Data: " << key.data << std::endl;
+#endif /* DEBUG*/
+  return OPERATION_SUCCESSUL;
 }
-
 
 int HyperdexClient::remove(Key &key) {
   return OPERATION_SUCCESSUL;
 }
-
+/******************************************************************************
+*Init function
+******************************************************************************/
 int HyperdexClient::init() {
   /* create the admin */
   struct hyperdex_admin * admin =
@@ -152,16 +158,20 @@ int HyperdexClient::init() {
     fprintf(stderr,"Failed to create space!\n"
                 "ADMIN ID: %ld, STAT: %d, LOOP ID: %ld, STAT: %d\n",
             admin_id, admin_status, loop_id, loop_status);
-  } else {
-    printf("Success creating space:{ %s }\n", SPACE);
   }
+#ifdef DEBUG
+  printf("Success creating space:{ %s }\n", SPACE);
+#endif /* DEBUG*/
 
   /* Checking cluster stability*/
   admin_id = hyperdex_admin_wait_until_stable(admin, &admin_status);
   loop_id = hyperdex_admin_loop(admin, -1, &loop_status);
   if (loop_id != admin_id || admin_status != HYPERDEX_ADMIN_SUCCESS)
-    printf("Admin ID: %ld Status: %d \n",admin_id, admin_status);
-  else printf("Cluster stable\n");
+    fprintf(stderr,"Cluster not ready! Admin ID: %ld Status: %d \n",admin_id,
+            admin_status);
+#ifdef DEBUG
+    printf("Cluster stable\n");
+#endif /* DEBUG*/
   hyperdex_admin_destroy(admin);
 
   /* Setup the hyperdex client */
@@ -171,7 +181,9 @@ int HyperdexClient::init() {
     fprintf(stderr,"Cannot create HyperDex client.\n");
     return HYPERDEX_CLIENT_CREATION_FAILED;
   }
-  else printf("HyperDex client created.\n\n");
+#ifdef DEBUG
+    printf("HyperDex client created.\n\n");
+#endif /* DEBUG*/
   return OPERATION_SUCCESSUL;
 }
 
