@@ -108,8 +108,8 @@ int local_tests::read_after_write(size_t writeMB, size_t readMB) {
 int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
   std::cout << "MR (Multiple Reads TEST\n" <<std::endl;
   size_t op_size;
-  writeMB >= readMB ? op_size = writeMB * 1024 * 1024
-                    : op_size = readMB * 1024 * 1024;
+  writeMB >= readMB ? op_size = writeMB * 1024
+                    : op_size = readMB * 1024;
   char * write_buf = randstring(op_size);
   char *read_buf = (char *) malloc(op_size);
 
@@ -119,7 +119,7 @@ int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
 
 //IRIS
   fh = iris::fopen("/home/anthony/temp/file1.dat", "w");
-  bytes_written = iris::fwrite(write_buf, sizeof(char), writeMB*1024*1024, fh);
+  bytes_written = iris::fwrite(write_buf, sizeof(char), writeMB*1024, fh);
   bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
                      : std::cout<<"Bytes written: " << bytes_written << std::endl;
   iris::fclose(fh);
@@ -127,7 +127,7 @@ int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
   fh = iris::fopen("/home/anthony/temp/file1.dat", "r");
   auto t1 = std::chrono::high_resolution_clock::now();
   for(size_t i=0; i< writeMB; ++i){
-    bytes_read += iris::fread(read_buf, sizeof(char), readMB*1024*1024, fh);
+    bytes_read += iris::fread(read_buf, sizeof(char), readMB*1024, fh);
     iris::fseek(fh, 0, SEEK_SET);
   }
   auto t2 = std::chrono::high_resolution_clock::now();
@@ -143,7 +143,7 @@ int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
   bytes_read =0;
   bytes_written =0;
   fh = std::fopen("/home/anthony/temp/file1.dat", "w");
-  bytes_written = std::fwrite(write_buf, sizeof(char), writeMB * 1024 * 1024, fh);
+  bytes_written = std::fwrite(write_buf, sizeof(char), writeMB * 1024, fh);
   bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
                      : std::cout<<"Bytes written: " << bytes_written <<
                                 std::endl;
@@ -152,7 +152,7 @@ int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
   fh = std::fopen("/home/anthony/temp/file1.dat", "r");
   t1 = std::chrono::high_resolution_clock::now();
   for(size_t i=0; i< writeMB; ++i){
-    bytes_read += std::fread(read_buf, sizeof(char), readMB*1024*1024,fh);
+    bytes_read += std::fread(read_buf, sizeof(char), readMB*1024,fh);
     std::fseek(fh, 0, SEEK_SET);
   }
   t2 = std::chrono::high_resolution_clock::now();

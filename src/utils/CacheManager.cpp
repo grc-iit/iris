@@ -6,7 +6,8 @@ std::shared_ptr<CacheManager> CacheManager::instance = nullptr;
 /******************************************************************************
 *Constructor
 ******************************************************************************/
-CacheManager::CacheManager() :cacheCapacity(CACHE_CAPACITY) {
+CacheManager::CacheManager() {
+  cacheCapacity = CACHE_CAPACITY;
   cacheMap = HIPII();
   lruList = LI();
 }
@@ -30,14 +31,20 @@ int CacheManager::isCached(Key &key) {
   auto cacheline = cacheMap.find(key.name);
   if(cacheline == cacheMap.end()) return NO_DATA_FOUND;
   refreshLRU(cacheline);
+  printf("Cached data:  %s", (char*)cacheline->second.first);
   key.data = cacheline->second.first;
   return OPERATION_SUCCESSFUL;
 }
 
-int CacheManager::addDataToBuffer(Key &key) {
+int CacheManager::addToCache(Key &key) {
+  printf("Adding to cache...Key: %s\n", key.name);
   auto cacheline = cacheMap.find(key.name);
-  if (cacheline != cacheMap.end()) refreshLRU(cacheline);
+  if (cacheline != cacheMap.end()){
+    refreshLRU(cacheline);
+    printf("Key: %s  found in cache. NOT adding\n", key.name);
+  }
   else {
+    printf("Key: %s  NOT found in cache. Adding\n", key.name);
     if (cacheMap.size() == cacheCapacity) {
       cacheMap.erase(lruList.back());
       lruList.pop_back();

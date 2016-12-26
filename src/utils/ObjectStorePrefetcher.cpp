@@ -35,8 +35,9 @@ int ObjectStorePrefetcher::fetch(const char *fileName, long int fileOffset,
   if(status == OPERATION_SUCCESSFUL){
     auto keys = posixMapper->generateKeys(fileName, fileOffset, operationSize);
     for (auto&& key:keys) {
+      printf("Fetching key: %s\n", key.name);
       objectStoreClient->get(key);
-      cacheManager->addDataToBuffer(key);
+      cacheManager->addToCache(key);
     }
   }
   else return FETCH_FAILED;
