@@ -114,10 +114,7 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
   size_t bufferIndex = 0;
   for (auto&& key : keys) {
     auto originalKeySize = key.size;
-    if(cacheManager->isCached(key) == NO_DATA_FOUND){
-      printf("Before get!!!! Key: %s\n", key.name);
-      objectStoreClient->get(key);
-    }
+    if(cacheManager->isCached(key) == NO_DATA_FOUND) objectStoreClient->get(key);
     buffer.update(key.data,bufferIndex,originalKeySize);
     bufferIndex+=originalKeySize;
   }

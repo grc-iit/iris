@@ -30,9 +30,10 @@ private:
 ******************************************************************************/
   static std::shared_ptr<CacheManager> instance;
   int cacheCapacity;
-  typedef std::list<const char *> LI;
+
+  typedef std::list<std::string> LI;
   typedef std::pair<void *, LI::iterator> PII;
-  typedef std::unordered_map<const char *, PII> HIPII;
+  typedef std::unordered_map<std::string, PII> HIPII;
   HIPII cacheMap;
   LI lruList;
 

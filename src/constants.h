@@ -15,6 +15,7 @@
 ******************************************************************************/
 #include <cstring>
 #include <sys/types.h>
+#include <string>
 #include "return_codes.h"
 /******************************************************************************
 *Iris library parameters
@@ -23,7 +24,7 @@ static const u_int16_t MAX_FILENAME_LENGTH = 256;
 static const u_int16_t FILE_BUFFER_CAPACITY = 1;
 static const char * POSIX_MODE = "RELAXED"; //"STRICT" - "RELAXED"
 static const u_int16_t MAX_KEY_LENGTH = 32;
-static const size_t MAX_OBJ_SIZE = (512);
+static const size_t MAX_OBJ_SIZE = (2*1024*1024);
 static const u_int64_t CACHE_CAPACITY = 1073741824;
 /******************************************************************************
 *Prefetcher
@@ -68,7 +69,7 @@ static const u_int16_t COORDINATOR_PORT = 1982;
 *Key structure
 ******************************************************************************/
 struct Key{
-    char * name;
+    const char * name;
     std::size_t offset;
     std::size_t size;
     void* data;
