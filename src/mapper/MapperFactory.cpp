@@ -20,34 +20,30 @@ MapperFactory::MapperFactory() {}
 /******************************************************************************
 *Destructor
 ******************************************************************************/
-MapperFactory::~MapperFactory() {}
+MapperFactory::~MapperFactory() {
+
+}
 /******************************************************************************
 *Gettters and setters
 ******************************************************************************/
-std::shared_ptr<MapperFactory> MapperFactory::getInstance() {
-  if(instance== nullptr){
-    instance=std::shared_ptr<MapperFactory>(new MapperFactory());
-  }
-  return instance;
-}
 std::shared_ptr<AbstractMapper> MapperFactory::getMapper(const char *name) {
-  AbstractMapper* mapperInstance = nullptr;
+  std::shared_ptr<AbstractMapper> mapperInstance;
   if(strcmp(name,POSIX_MAPPER)==0){
-    mapperInstance = new POSIXMapper();
+    mapperInstance = std::shared_ptr<POSIXMapper>();
   }
   else if(strcmp(name,MPIIO_MAPPER)==0){
-    mapperInstance = new MPIIOMapper();
+    mapperInstance = std::shared_ptr<MPIIOMapper>();
   }
   else if(strcmp(name,HDF5_MAPPER)==0){
-    mapperInstance = new HDF5Mapper();
+    mapperInstance = std::shared_ptr<HDF5Mapper>();
   }
   else if(strcmp(name,PNETCDF_MAPPER)==0){
-    mapperInstance = new PNETCDFMapper();
+    mapperInstance = std::shared_ptr<PNETCDFMapper>();
   }
   else if(name == S3_MAPPER){
-    mapperInstance = new S3Mapper();
+    mapperInstance = std::shared_ptr<S3Mapper>();
   }
   else return nullptr;
-  return std::shared_ptr<AbstractMapper>(mapperInstance);
+  return mapperInstance;
 }
 

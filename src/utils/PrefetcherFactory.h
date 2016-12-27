@@ -36,7 +36,11 @@ public:
 /******************************************************************************
 *Gettters and setters
 ******************************************************************************/
-  static std::shared_ptr<PrefetcherFactory> getInstance();
+  inline static std::shared_ptr<PrefetcherFactory> getInstance(){
+    return instance== nullptr ? instance=std::shared_ptr<PrefetcherFactory>
+        (new PrefetcherFactory())
+                              : instance;
+  }
   std::shared_ptr<AbstractPrefetcher> getPrefetcher(const char* name);
 };
 

@@ -8,7 +8,7 @@ OPTIMIZATIONS
 ################################################################################
 1) use const everywhere
 2) fix constants.h with constants (DONE)
-3) error checking everywhere
+3) error checking everywhere (ALMOST DONE)
 4) Mapper saves a map of collection of keys for a given range of offsets
 5) Call by reference wherever possible
 6) Change Key to a class and store the maps and implement the equal operator

@@ -59,7 +59,8 @@ public:
   int updateMetadataOnClose(FILE * fh, const char * filename);
   int updateMetadataOnRead(FILE * fh, std::size_t operationSize);
   int updateMetadataOnWrite(FILE *fh, std::size_t operationSize);
-  int updateFpPosition(FILE * fh, long int offset, int origin);
+  int updateFpPosition(FILE * fh, long int offset, int origin, const char*
+  filename);
   long int getFpPosition(FILE * fh);
 /******************************************************************************
 *Destructor

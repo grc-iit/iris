@@ -17,15 +17,6 @@ CacheManager::CacheManager() {
 ******************************************************************************/
 CacheManager::~CacheManager() {}
 /******************************************************************************
-*Getters and setters
-******************************************************************************/
-std::shared_ptr<CacheManager> CacheManager::getInstance() {
-  if(instance== nullptr){
-    instance=std::shared_ptr<CacheManager>(new CacheManager());
-  }
-  return instance;
-}
-/******************************************************************************
 *Functions
 ******************************************************************************/
 int CacheManager::isCached(Key &key) {

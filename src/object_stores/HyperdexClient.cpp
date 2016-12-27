@@ -21,15 +21,6 @@ HyperdexClient::HyperdexClient() {
 ******************************************************************************/
 HyperdexClient::~HyperdexClient() {}
 /******************************************************************************
-*Getters and setters
-******************************************************************************/
-std::shared_ptr<HyperdexClient> HyperdexClient::getInstance() {
-  if (instance == nullptr) {
-    instance = std::shared_ptr<HyperdexClient>(new HyperdexClient());
-  }
-  return instance;
-}
-/******************************************************************************
 *Interface
 ******************************************************************************/
 int HyperdexClient::get(Key &key) {
@@ -58,9 +49,48 @@ int HyperdexClient::get(Key &key) {
   }
 #ifdef DEBUG
   std::cout << "Get operation complete" << std::endl;
-  std::cout << "Key: " << key.name << "\t Data: " << key.data << std::endl;
+  std::cout << "Key: " << key.name << std::endl;
 #endif /* DEBUG*/
   hyperdex_client_destroy_attrs(attributes,attributes_sz);
+  return OPERATION_SUCCESSFUL;
+}
+
+int HyperdexClient::getRange(std::vector<Key> keys) {
+  int64_t op_id[keys.size()], loop_id[keys.size()];
+  const struct hyperdex_client_attribute* attributes[keys.size()];
+  std::size_t attributes_sz[keys.size()];
+  enum hyperdex_client_returncode op_status[keys.size()], loop_status[keys.size()];
+
+  for(int i=0; i< keys.size(); ++i){
+    op_id[i] = hyperdex_client_get(hyperdexClient,
+                                SPACE,
+                                keys[i].name,
+                                strlen(keys[i].name),
+                                &op_status[i],
+                                &attributes[i],
+                                &attributes_sz[i]);
+  }
+
+  for(int i=0; i< keys.size(); ++i){
+    loop_id[i] = hyperdex_client_loop(hyperdexClient, -1, &loop_status[i]);
+    if (op_id[i] == loop_id[i] && loop_status[i] == HYPERDEX_CLIENT_SUCCESS &&
+        attributes_sz[i]!=0){
+      keys[i].data=malloc(attributes[i][0].value_sz);
+      memcpy(keys[i].data, attributes[i][0].value, attributes[i][0].value_sz);
+      keys[i].size = attributes[i][0].value_sz;
+    }else{
+#ifdef DEBUG
+      fprintf(stderr, "Get FAILED! \nOP ID: %ld, STAT: %d, LOOP ID: %ld, STAT:"
+        " %d\n", op_id[i], op_status[i], loop_id[i], loop_status[i]);
+#endif /* DEBUG*/
+      return HYPERDEX_GET_OPERATION_FAILED;
+    }
+#ifdef DEBUG
+    std::cout << "Get operation complete" << std::endl;
+  std::cout << "Key: " << keys[i].name << std::endl;
+#endif /* DEBUG*/
+    hyperdex_client_destroy_attrs(attributes[i],attributes_sz[i]);
+  }
   return OPERATION_SUCCESSFUL;
 }
 
@@ -119,7 +149,7 @@ int HyperdexClient::put(Key &key) {
   }
 #ifdef DEBUG
   std::cout << "Put operation complete" << std::endl;
-  std::cout << "Key: " << key.name << "\t Data: " << key.data << std::endl;
+  std::cout << "Key: " << key.name << std::endl;
 #endif /* DEBUG*/
   return OPERATION_SUCCESSFUL;
 }
@@ -186,6 +216,8 @@ int HyperdexClient::init() {
 #endif /* DEBUG*/
   return OPERATION_SUCCESSFUL;
 }
+
+
 
 
 

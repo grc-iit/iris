@@ -66,13 +66,14 @@ int local_tests::read_after_write(size_t writeMB, size_t readMB) {
 
 //IRIS
   auto t1 = std::chrono::high_resolution_clock::now();
-  fh = iris::fopen("/home/anthony/temp/file1.dat", "w");
-  bytes_written = iris::fwrite(write_buf, writeMB,  1024 * 1024, fh);
+  fh = iris::fopen("file.dat", "w");
+  bytes_written = iris::fwrite(write_buf, sizeof(char), writeMB* 1024 * 1024,
+      fh);
   bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
                      : std::cout<<"Bytes written: " << bytes_written << std::endl;
   iris::fclose(fh);
-  fh = iris::fopen("/home/anthony/temp/file1.dat", "r");
-  bytes_read = iris::fread(read_buf, readMB, 1024 * 1024, fh);
+  fh = iris::fopen("file.dat", "r");
+  bytes_read = iris::fread(read_buf, sizeof(char), readMB *1024 * 1024, fh);
   bytes_read == 0 ? std::cout <<"File read failed!" <<std::endl
                   : std::cout<<"Bytes read: " << bytes_read << std::endl;
   iris::fclose(fh);
@@ -117,7 +118,6 @@ int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
   size_t bytes_read=0;
   size_t bytes_written =0;
 //POSIX
-
   fh = std::fopen("/home/anthony/temp/file1.dat", "w");
   bytes_written = std::fwrite(write_buf, sizeof(char), writeMB * 1024*1024, fh);
   bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
@@ -128,7 +128,7 @@ int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
 
   auto t1 = std::chrono::high_resolution_clock::now();
   fh = std::fopen("/home/anthony/temp/file1.dat", "r");
-  for(size_t i=0; i< writeMB; ++i){
+  for(size_t i=0; i< writeMB && bytes_read <= bytes_written; ++i){
     bytes_read += std::fread(read_buf, sizeof(char), readMB*1024*1024,fh);
     //std::fseek(fh, 0, SEEK_SET);
   }
@@ -151,7 +151,7 @@ int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
   t1 = std::chrono::high_resolution_clock::now();
   fh = iris::fopen("file.dat", "r");
 
-  for(size_t i=0; i< writeMB; ++i){
+  for(size_t i=0; i< writeMB && bytes_read <= bytes_written; ++i){
     bytes_read += iris::fread(read_buf, sizeof(char), readMB*1024*1024, fh);
     //iris::fseek(fh, 0, SEEK_SET);
   }

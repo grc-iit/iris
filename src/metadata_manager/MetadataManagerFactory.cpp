@@ -26,20 +26,10 @@ MetadataManagerFactory::~MetadataManagerFactory() {}
 /******************************************************************************
 *Getters and setters
 ******************************************************************************/
-std::shared_ptr<MetadataManagerFactory> MetadataManagerFactory::getInstance() {
-  if(instance == nullptr){
-    instance =
-        std::shared_ptr<MetadataManagerFactory>(new MetadataManagerFactory());
-  }
-  return instance;
-}
-
 std::shared_ptr<IrisMetadataManager>
 MetadataManagerFactory::getMetadataManager(const char *name) {
   auto iter = metadataManagerMap.find(name);
-  if(iter != metadataManagerMap.end()){
-    return iter->second;
-  }
+  if(iter != metadataManagerMap.end()) return iter->second;
   else {
     IrisMetadataManager *metadataManagerInstance = nullptr;
     if (strcmp(name, IRIS_METADATA_MANAGER) == 0) {

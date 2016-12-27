@@ -39,13 +39,21 @@ public:
 /******************************************************************************
 *Getters and setters
 ******************************************************************************/
-  static std::shared_ptr<HyperdexClient> getInstance();
+  inline static std::shared_ptr<HyperdexClient> getInstance(){
+    return instance == nullptr ? instance = std::shared_ptr<HyperdexClient>
+        (new HyperdexClient())
+                               : instance;
+  }
 /******************************************************************************
 *Interface
 ******************************************************************************/
   int get(Key &key) override;
   int put(Key &key) override;
   int remove(Key &key) override;
+/* Hyperdex specific calls*/
+  int getRange(std::vector<Key> keys);
+  /*TODO:
+  int put_range(std::vector<Key> keys);*/
 /******************************************************************************
 *Destructor
 ******************************************************************************/

@@ -33,7 +33,11 @@ public:
 /******************************************************************************
 *Gettters and setters
 ******************************************************************************/
-  static std::shared_ptr<MapperFactory> getInstance();
+  inline static std::shared_ptr<MapperFactory> getInstance(){
+    return instance== nullptr ? instance = std::shared_ptr<MapperFactory>
+        (new MapperFactory())
+                              : instance;
+  }
   std::shared_ptr<AbstractMapper> getMapper(const char* name);
 /******************************************************************************
 *Destructor

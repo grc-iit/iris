@@ -21,39 +21,47 @@ POSIXMetadataManager::~POSIXMetadataManager() {
 *Interface
 ******************************************************************************/
 bool POSIXMetadataManager::checkIfFileExists(const char * filename) {
+  //Error checks
+#ifdef RELEASE
   /*Check if the filename is longer than allowed (<256)*/
   if(std::strlen(filename) > MAX_FILENAME_LENGTH){
-    fprintf(stderr, "ERROR! File name too long!\n fn: checkIfFileExists");
+    fprintf(stderr, "ERROR! File name too long!\n fn: checkIfFileIsOpen");
     exit(-1);
   }
+#endif /*RELEASE*/
   /* Check if the filename exists in the map of the created files*/
   auto iterator = created_files.find(filename);
   return !(iterator == created_files.end());
 }
 
 bool POSIXMetadataManager::checkIfFileIsOpen(const char *filename) {
+  //Error checks
+#ifdef RELEASE
   /*Check if the filename is longer than allowed (<256)*/
   if(std::strlen(filename) > MAX_FILENAME_LENGTH){
     fprintf(stderr, "ERROR! File name too long!\n fn: checkIfFileIsOpen");
     exit(-1);
   }
+#endif /*RELEASE*/
   if(checkIfFileExists(filename)) {
     /* Check if the file has been previously been opened*/
     auto iterator = created_files.find(filename);
-    if (iterator == created_files.end()) return false;
-    return created_files[filename].opened;
+    return iterator == created_files.end() ?
+           false : created_files[filename].opened;
   }
   else{
 #ifdef DEBUG
-    fprintf(stderr, "Check if file is opened failed because file does not
-    exist! Please check the file name\n  fn: checkIfFileIsOpen");
+    fprintf(stderr, "ERROR! File does not exist!\n fn: checkIfFileIsOpen");
 #endif /* DEBUG*/
     return false;
   }
 }
 
 const char *POSIXMetadataManager::getFilename(FILE *fh) {
+  //Error checks
+#ifdef RELEASE
   if(fh == nullptr) return nullptr;
+#endif /*RELEASE*/
   auto iterator = fh2filename.find(fh);
   if(iterator == fh2filename.end()) return nullptr;
   else return iterator->second; //holds the filename
@@ -62,8 +70,10 @@ const char *POSIXMetadataManager::getFilename(FILE *fh) {
 int POSIXMetadataManager::createMetadata(FILE * fh, const char * filename,
                                          const char* mode) {
   //Error checks
+#ifdef RELEASE
   if(fh == nullptr || std::strlen(filename) > MAX_FILENAME_LENGTH)
     return METADATA_CREATION_FAILED;
+#endif /*RELEASE*/
   Stat file_metadata;
   if(strcmp(POSIX_MODE,"STRICT")==0)
     file_metadata = {true,
@@ -91,8 +101,10 @@ int POSIXMetadataManager::createMetadata(FILE * fh, const char * filename,
 int POSIXMetadataManager::updateMetadataOnOpen(FILE * fh, const char * filename,
                                                const char* mode) {
   //Error checks
+#ifdef RELEASE
   if(fh == nullptr || std::strlen(filename) > MAX_FILENAME_LENGTH)
     return METADATA_UPDATE_FAILED__OPEN;
+#endif /*RELEASE*/
   if(strcmp(POSIX_MODE,"STRICT")==0)
   created_files[filename] = {true,
                              mode,
@@ -117,8 +129,10 @@ int POSIXMetadataManager::updateMetadataOnOpen(FILE * fh, const char * filename,
 
 int POSIXMetadataManager::updateMetadataOnClose(FILE * fh, const char * filename) {
   //Error checks
+#ifdef RELEASE
   if(fh == nullptr || std::strlen(filename) > MAX_FILENAME_LENGTH)
     return METADATA_UPDATE_FAILED__CLOSE;
+#endif /*RELEASE*/
   if(strcmp(POSIX_MODE,"STRICT")==0){
     created_files[filename].opened = false;
     created_files[filename].atime = time(NULL);
@@ -131,55 +145,76 @@ int POSIXMetadataManager::updateMetadataOnClose(FILE * fh, const char * filename
 
 int POSIXMetadataManager::updateMetadataOnRead(FILE *fh, std::size_t operationSize) {
   //Error checks
+#ifdef RELEASE
   if(fh == nullptr || operationSize == 0) return METADATA_UPDATE_FAILED__READ;
+#endif /*RELEASE*/
   const char * filename = getFilename(fh);
+#ifdef RELEASE
   if(filename == nullptr) return FILENAME_DOES_NOT_EXIST;
+#endif /*RELEASE*/
   if(strcmp(POSIX_MODE,"STRICT")==0) created_files[filename].atime = time(NULL);
-  updateFpPosition(fh, operationSize, SEEK_CUR);
+  updateFpPosition(fh, operationSize, SEEK_CUR, filename);
   return OPERATION_SUCCESSFUL;
 }
 
 int POSIXMetadataManager::updateMetadataOnWrite(FILE *fh,
                                                 std::size_t operationSize) {
+#ifdef RELEASE
   if(fh == nullptr || operationSize == 0) return METADATA_UPDATE_FAILED__WRITE;
+#endif /*RELEASE*/
   const char * filename = getFilename(fh);
+#ifdef RELEASE
   if(filename == nullptr) return FILENAME_DOES_NOT_EXIST;
+#endif /*RELEASE*/
   if(strcmp(POSIX_MODE,"STRICT")==0){
     created_files[filename].atime = time(NULL);
     created_files[filename].mtime = time(NULL);
   }
   long int fileOffset = getFpPosition(fh);
+#ifdef RELEASE
   if(fileOffset < 0) return FP_DOES_NOT_EXIST;
+#endif /*RELEASE*/
   created_files[filename].st_size =
       fileOffset + operationSize > created_files[filename].st_size
       ? fileOffset + operationSize : created_files[filename].st_size;
-  updateFpPosition(fh, operationSize, SEEK_CUR);
+  updateFpPosition(fh, operationSize, SEEK_CUR, filename);
   return OPERATION_SUCCESSFUL;
 }
 
 int POSIXMetadataManager::updateFpPosition(FILE *fh, long int offset,
-                                           int origin) {
+                                           int origin, const char * filename) {
+#ifdef RELEASE
   if(fh == nullptr) return UPDATE_FILE_POINTER_FAILED;
+#endif /*RELEASE*/
+
   auto index = pointer.find(fh);
   if(index == pointer.end()) return UPDATE_FILE_POINTER_FAILED;
-
+#ifdef RELEASE
   const char * filename = getFilename(fh);
   if(filename == nullptr) return FILENAME_DOES_NOT_EXIST;
+#endif /*RELEASE*/
+
   switch(origin){
     case SEEK_SET:
       pointer[index->first] = 0+offset;
-      if(pointer[index->first] <0 || pointer[index->first] > getFilesize(filename))
+#ifdef RELEASE
+    if(pointer[index->first] <0 || pointer[index->first] > getFilesize(filename))
         return UPDATE_FILE_POINTER_FAILED;
+#endif /*RELEASE*/
       break;
     case SEEK_CUR:
       pointer[index->first] += offset;
-      if(pointer[index->first] <0 || pointer[index->first] > getFilesize(filename))
+#ifdef RELEASE
+    if(pointer[index->first] <0 || pointer[index->first] > getFilesize(filename))
         return UPDATE_FILE_POINTER_FAILED;
+#endif /*RELEASE*/
       break;
     case SEEK_END:
       pointer[index->first] = getFilesize(filename) + offset;
-      if(pointer[index->first] <0 || pointer[index->first] > getFilesize(filename))
+#ifdef RELEASE
+    if(pointer[index->first] <0 || pointer[index->first] > getFilesize(filename))
         return UPDATE_FILE_POINTER_FAILED;
+#endif /*RELEASE*/
       break;
     default:
       fprintf(stderr, "Seek origin fault!\n");
@@ -189,7 +224,9 @@ int POSIXMetadataManager::updateFpPosition(FILE *fh, long int offset,
 }
 
 long int POSIXMetadataManager::getFpPosition(FILE *fh) {
+#ifdef RELEASE
   if(fh == nullptr) return -1;
+#endif /*RELEASE*/
   auto index = pointer.find(fh);
   if(index == pointer.end()) return -1;
   else return index->second; //holds the offset
@@ -199,8 +236,10 @@ long int POSIXMetadataManager::getFpPosition(FILE *fh) {
 *Functions
 ******************************************************************************/
 long int POSIXMetadataManager::getFilesize(const char *filename) {
+#ifdef RELEASE
   if(!checkIfFileExists(filename) || std::strlen(filename) > MAX_FILENAME_LENGTH)
     return -1;
+#endif /*RELEASE*/
   auto iterator = created_files.find(filename);
   if(iterator == created_files.end()) return -1;
   return iterator->second.st_size;

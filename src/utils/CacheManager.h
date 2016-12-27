@@ -46,7 +46,11 @@ public:
 /******************************************************************************
 *Getters and setters
 ******************************************************************************/
-  static std::shared_ptr<CacheManager> getInstance();
+  inline static std::shared_ptr<CacheManager> getInstance(){
+    return instance== nullptr ? instance=std::shared_ptr<CacheManager>
+        (new CacheManager())
+                              : instance;
+  }
 /******************************************************************************
 *Functions
 ******************************************************************************/

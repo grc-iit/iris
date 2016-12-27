@@ -32,7 +32,11 @@ public:
 /******************************************************************************
 *Getters and setters
 ******************************************************************************/
-  static std::shared_ptr<ObjectStoreFactory> getInstance();
+  inline static std::shared_ptr<ObjectStoreFactory> getInstance(){
+    return instance == nullptr ? instance = std::shared_ptr<ObjectStoreFactory>
+        (new ObjectStoreFactory())
+                               : instance;
+  }
   std::shared_ptr<AbstractObjectStore> getObjectStore(const char* name);
 /******************************************************************************
 *Destructor

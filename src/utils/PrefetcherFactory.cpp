@@ -20,13 +20,6 @@ PrefetcherFactory::~PrefetcherFactory() {}
 /******************************************************************************
 *Gettters and setters
 ******************************************************************************/
-std::shared_ptr<PrefetcherFactory> PrefetcherFactory::getInstance() {
-  PrefetcherFactory::instance = nullptr;
-  if(instance== nullptr){
-    instance=std::shared_ptr<PrefetcherFactory>(new PrefetcherFactory());
-  }
-  return instance;
-}
 std::shared_ptr<AbstractPrefetcher> PrefetcherFactory::getPrefetcher(const char *name) {
   AbstractPrefetcher* prefetcherInstance= nullptr;
   if(strcmp(name,FILESYSTEM_PREFETCHER)==0){

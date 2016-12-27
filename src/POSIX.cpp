@@ -4,6 +4,7 @@
 #include <cstring>
 #include <algorithm>
 #include <iostream>
+#include <future>
 #include "POSIX.h"
 #include "utils/Buffer.h"
 /******************************************************************************
@@ -81,7 +82,8 @@ int iris::fseek(FILE *stream, long int offset, int origin) {
   auto posixMetadataManager = std::static_pointer_cast<POSIXMetadataManager>
       (apiInstance->getMetadataManagerFactory()->
           getMetadataManager(POSIX_METADATA_MANAGER));
-  posixMetadataManager->updateFpPosition(stream, offset, origin);
+  const char * filename = posixMetadataManager->getFilename(stream);
+  posixMetadataManager->updateFpPosition(stream, offset, origin, filename);
   return 0;
 }
 
@@ -104,10 +106,13 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
   auto objectStoreClient = std::static_pointer_cast<HyperdexClient>
           (apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT));
 
-
   const char * filename = posixMetadataManager->getFilename(stream);
   long int fileOffset = posixMetadataManager->getFpPosition(stream);
   auto filesize = posixMetadataManager->getFilesize(filename);
+  ;
+  std::future<int> asyncPrefetch =
+      std::async (std::launch::async,&ObjectStorePrefetcher::fetch,
+                  objectStorePrefetcher, filename, fileOffset,operationSize, filesize);
   auto keys = posixMapper->generateKeys(filename, fileOffset, operationSize);
 
   Buffer buffer = Buffer(ptr);
@@ -119,10 +124,10 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
     bufferIndex+=originalKeySize;
   }
 #ifdef DEBUG
-  std::printf("Reading Data %-30s \n", ptr );
+  //std::printf("Reading Data %-30s \n", ptr );
 #endif
-  objectStorePrefetcher->fetch(filename, fileOffset, operationSize, filesize);
   posixMetadataManager->updateMetadataOnRead(stream, operationSize);
+  asyncPrefetch.get();
 #ifdef DEBUG
   std::cout << "Inside fread end" << std::endl;
 #endif/*DEBUG*/
@@ -153,7 +158,7 @@ size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
   auto keys = posixMapper->generateKeys(filename, fileOffset, operationSize);
   std::size_t bufferIndex = 0;
   for (auto &&key : keys) {
-    key.data=malloc(key.size);
+    key.data = malloc(key.size);
     memcpy(key.data,(char*)ptr + bufferIndex,key.size);
     objectStoreClient->put(key);
     cacheManager->addToCache(key);
@@ -163,5 +168,6 @@ size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
 #ifdef DEBUG
   std::cout << "Inside fwrite end" << std::endl;
 #endif/*DEBUG*/
+
   return operationSize;
 }

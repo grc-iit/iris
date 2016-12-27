@@ -60,25 +60,28 @@ public:
 /******************************************************************************
 *Getters and setters
 ******************************************************************************/
-  static std::shared_ptr<API> getInstance();
+  inline static std::shared_ptr<API> getInstance(){
+    return instance== nullptr ? instance=std::shared_ptr<API>(new API())
+                              : instance;
+  }
 
-  std::shared_ptr<CacheManager> getCacheManager() {
+  inline std::shared_ptr<CacheManager> getCacheManager(){
     return cacheManager;
   }
 
-  std::shared_ptr<PrefetcherFactory> getPrefetcherFactory() {
+  inline std::shared_ptr<PrefetcherFactory> getPrefetcherFactory(){
     return prefetcherFactory;
   }
 
-  std::shared_ptr<MetadataManagerFactory> getMetadataManagerFactory() {
+  inline std::shared_ptr<MetadataManagerFactory> getMetadataManagerFactory() {
     return metadataManagerFactory;
   }
 
-  std::shared_ptr<MapperFactory> getMapperFactory() {
+  inline std::shared_ptr<MapperFactory> getMapperFactory(){
     return mapperFactory;
   }
 
-  std::shared_ptr<ObjectStoreFactory> getObjectStoreFactory() {
+  inline std::shared_ptr<ObjectStoreFactory> getObjectStoreFactory(){
     return objectStoreFactory;
   }
 

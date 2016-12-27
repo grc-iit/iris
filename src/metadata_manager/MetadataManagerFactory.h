@@ -35,7 +35,11 @@ public:
 /******************************************************************************
 *Getters and setters
 ******************************************************************************/
-  static std::shared_ptr<MetadataManagerFactory> getInstance();
+  inline static std::shared_ptr<MetadataManagerFactory> getInstance(){
+    return instance == nullptr ? instance = std::shared_ptr<MetadataManagerFactory>
+                                         (new MetadataManagerFactory())
+                               : instance;
+  }
   std::shared_ptr<IrisMetadataManager> getMetadataManager(const char* name);
 /******************************************************************************
 *Destructor

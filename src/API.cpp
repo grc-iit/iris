@@ -17,15 +17,7 @@ API::API() {
 *Destructor
 ******************************************************************************/
 API::~API() {}
-/******************************************************************************
-*Getters and setters
-******************************************************************************/
-std::shared_ptr<API> API::getInstance() {
-  if(API::instance== nullptr){
-    API::instance=std::shared_ptr<API>(new API());
-  }
-  return API::instance;
-}
+
 
 
 

@@ -15,13 +15,6 @@ ObjectStoreFactory::~ObjectStoreFactory() {}
 /******************************************************************************
 *Getters and setters
 ******************************************************************************/
-std::shared_ptr<ObjectStoreFactory> ObjectStoreFactory::getInstance() {
-  if (instance == nullptr) {
-    instance = std::shared_ptr<ObjectStoreFactory>(new ObjectStoreFactory());
-  }
-  return instance;
-}
-
 std::shared_ptr<AbstractObjectStore> ObjectStoreFactory::getObjectStore(const
                                                                         char* name) {
   std::shared_ptr<AbstractObjectStore> objectStoreClient;
