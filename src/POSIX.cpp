@@ -96,16 +96,14 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
   std::cout << "####################  FREAD ####################" << std::endl;
 #endif/*DEBUG*/
   if(asyncOperation.valid()) asyncOperation.get();
-#ifdef TIMER
+#ifdef TIMER1
   Timer timer = Timer(); timer.startTime();
 #endif
   auto operationSize = size*count;
 #ifdef RELEASE
   if(operationSize == 0) return 0;
 #endif /*RELEASE*/
-
   auto apiInstance = API::getInstance();
-
   auto posixMetadataManager = std::static_pointer_cast<POSIXMetadataManager>
       (apiInstance->getMetadataManagerFactory()->
           getMetadataManager(POSIX_METADATA_MANAGER));
@@ -117,10 +115,10 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
   auto objectStoreClient = std::static_pointer_cast<HyperdexClient>
       (apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT));
 
-
   const char * filename = posixMetadataManager->getFilename(stream);
   long int fileOffset = posixMetadataManager->getFpPosition(stream);
   auto filesize = posixMetadataManager->getFilesize(filename);
+
   auto keys = posixMapper->generateKeys(filename, fileOffset, operationSize);
 
   Buffer buffer = Buffer(ptr);
@@ -128,17 +126,18 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
   for (auto&& key : keys) {
     auto originalKeySize = key.size;
     if(cacheManager->isCached(key) == NO_DATA_FOUND) objectStoreClient->get(key);
-    buffer.update(key.data,bufferIndex,originalKeySize);
+    buffer.update(key.data,bufferIndex,
+                  originalKeySize>strlen((char*)key.data)?strlen((char*)key.data)
+                                                         :originalKeySize);
+
     bufferIndex+=originalKeySize;
   }
-#ifdef DEBUG2
-  std::printf("Reading Data %-20s \n", (char*)ptr );
-#endif
-/*  asyncOperation= std::async (std::launch::async,&ObjectStorePrefetcher::fetch,
-                  objectStorePrefetcher, filename, fileOffset,operationSize, filesize);*/
-  objectStorePrefetcher->fetch(filename, fileOffset, operationSize, filesize);
+  asyncOperation= std::async (std::launch::async,
+                              &ObjectStorePrefetcher::fetch,
+                  objectStorePrefetcher, filename, fileOffset,operationSize, filesize);
+  //objectStorePrefetcher->fetch(filename, fileOffset, operationSize, filesize);
   posixMetadataManager->updateMetadataOnRead(stream, operationSize);
-#ifdef TIMER
+#ifdef TIMER1
   timer.endTime(__FUNCTION__);
 #endif
   return operationSize;
@@ -150,9 +149,10 @@ size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
 #ifdef DEBUG
   std::cout << "####################  FWRITE ###################" << std::endl;
 #endif/*DEBUG*/
-#ifdef TIMER
+#ifdef TIMER1
   Timer timer = Timer(); timer.startTime();
 #endif
+  if(asyncOperation.valid()) asyncOperation.get();
   auto operationSize = size * count;
   if(operationSize == 0) return 0;
 
@@ -181,7 +181,7 @@ size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
     bufferIndex += key.size;
   }
   posixMetadataManager->updateMetadataOnWrite(stream, operationSize);
-#ifdef TIMER
+#ifdef TIMER1
   timer.endTime(__FUNCTION__);
 #endif
   return operationSize;

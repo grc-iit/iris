@@ -81,7 +81,8 @@ int ObjectStorePrefetcher::engine(const char *fileName, long int &fileOffset,
 #endif
   switch(prefetchingMode){
     case SEQUENTIAL:
-      if(fileOffset+operationSize <= fileSize) fileOffset += operationSize;
+      if(fileOffset+operationSize <= fileSize-operationSize)
+        fileOffset += operationSize;
       else return PREFETCH_ENGINE_FAILED;
       break;
     case STRIDED:

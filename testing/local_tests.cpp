@@ -11,7 +11,7 @@
 
 
 int local_tests::simple_open_close(int repetitions) {
-  std::cout << "Simple Open-Close TEST" <<std::endl;
+  std::cout << std::endl << "Simple Open-Close TEST\n" <<std::endl;
   FILE* fh;
   Timer timer = Timer(); timer.startTime();
   for(int i =0; i<repetitions; ++i){
@@ -48,7 +48,7 @@ int local_tests::simple_open_close(int repetitions) {
 }
 
 int local_tests::read_after_write(size_t writeMB, size_t readMB) {
-  std::cout << "RAW (Read After Write) TEST\n" <<std::endl;
+  std::cout << std::endl<< "RAW (Read After Write) TEST\n" <<std::endl;
   size_t op_size;
   writeMB >= readMB ? op_size = writeMB * 1024 * 1024
                     : op_size = readMB * 1024 * 1024;
@@ -64,15 +64,15 @@ int local_tests::read_after_write(size_t writeMB, size_t readMB) {
   fh = iris::fopen("file.dat", "w");
   bytes_written = iris::fwrite(write_buf, sizeof(char), writeMB* 1024 * 1024,
       fh);
-  bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
+  /*bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
                      : std::cout<<"$$$$$$$$$$$$$$$$$$$$$$ MAIN "
-      "SAYS Bytes written: " << bytes_written << std::endl;
+      "SAYS Bytes written: " << bytes_written << std::endl;*/
   iris::fclose(fh);
   fh = iris::fopen("file.dat", "r");
   bytes_read = iris::fread(read_buf, sizeof(char), readMB *1024 * 1024, fh);
-  bytes_read == 0 ? std::cout <<"File read failed!" <<std::endl
+  /*bytes_read == 0 ? std::cout <<"File read failed!" <<std::endl
                   : std::cout<<"$$$$$$$$$$$$$$$$$$$$$$ MAIN "
-      "SAYS Bytes read: " << bytes_read << std::endl;
+      "SAYS Bytes read: " << bytes_read << std::endl;*/
   iris::fclose(fh);
   timer.endTime("IRIS");
 
@@ -81,14 +81,14 @@ int local_tests::read_after_write(size_t writeMB, size_t readMB) {
   timer.startTime();
   fh = std::fopen("/home/anthony/file1.dat", "w");
   bytes_written = std::fwrite(write_buf, sizeof(char), writeMB * 1024 * 1024, fh);
-  bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
+  /*bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
                      : std::cout<<"Bytes written: " << bytes_written <<
-                                std::endl;
+                                std::endl;*/
   std::fclose(fh);
   fh = std::fopen("/home/anthony/file1.dat", "r");
   bytes_read = std::fread(read_buf, sizeof(char), readMB * 1024 * 1024, fh);
-  bytes_read == 0 ? std::cout <<"File read failed!" <<std::endl
-                  : std::cout<<"Bytes read: " << bytes_read << std::endl;
+  /*bytes_read == 0 ? std::cout <<"File read failed!" <<std::endl
+                  : std::cout<<"Bytes read: " << bytes_read << std::endl;*/
   std::fclose(fh);
   timer.endTime("POSIX");
 
@@ -97,7 +97,7 @@ int local_tests::read_after_write(size_t writeMB, size_t readMB) {
   return 0;
 }
 int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
-  std::cout << "MR (Multiple Reads) TEST\n" <<std::endl;
+  std::cout << std::endl<< "MR (Multiple Reads) TEST\n" <<std::endl;
   size_t op_size;
   writeMB >= readMB ? op_size = writeMB * 1024*1024
                     : op_size = readMB * 1024*1024;
@@ -151,6 +151,44 @@ int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
   if(read_buf!= nullptr) free(read_buf);
   return 0;
 }
+
+int local_tests::alternateReadandWrite(size_t amount, int count) {
+  std::cout << std::endl<< "Alternate TEST\n" <<std::endl;
+  char * write_buf = randstring(amount*1024*1024);
+  char *read_buf = (char *) malloc(amount*1024*1024);
+
+  FILE* fh;
+  size_t bytes_read=0;
+  size_t bytes_written =0;
+
+//IRIS
+  fh = iris::fopen("file.dat", "w+");
+  Timer timer = Timer(); timer.startTime();
+  for(int i=0; i< count; ++i){
+    bytes_written += iris::fwrite(write_buf, sizeof(char), amount*1024*1024, fh);
+    iris::fseek(fh, i*amount*1024*1024, SEEK_SET);
+    //iris::fseek(fh, -(amount*1024*1024), SEEK_CUR);
+    bytes_read += iris::fread(read_buf, sizeof(char), amount*1024*1024, fh);
+  }
+  timer.endTime("IRIS");
+  iris::fclose(fh);
+
+//POSIX
+  bytes_read =0;
+  bytes_written=0;
+  fh = std::fopen("/home/anthony/file.dat", "w+");
+  timer = Timer(); timer.startTime();
+  for(int i=0; i< count; ++i){
+    bytes_written += std::fwrite(write_buf, sizeof(char), amount*1024*1024, fh);
+    std::fseek(fh, i*amount*1024*1024, SEEK_SET);
+    //std::fseek(fh, -(amount*1024*1024), SEEK_CUR);
+    bytes_read += std::fread(read_buf, sizeof(char), amount*1024*1024, fh);
+  }
+  timer.endTime("POSIX");
+  std::fclose(fh);
+  return 0;
+}
+
 char *local_tests::randstring(std::size_t length) {
   int n;
   static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-#'?!";
@@ -166,42 +204,6 @@ char *local_tests::randstring(std::size_t length) {
     }
   }
   return randomString;
-}
-
-int local_tests::alternateReadandWrite(size_t amount, int count) {
-  std::cout << "Alternate TEST\n" <<std::endl;
-  char * write_buf = randstring(amount*1024*1024);
-  char *read_buf = (char *) malloc(amount*1024*1024);
-
-  FILE* fh;
-  size_t bytes_read=0;
-  size_t bytes_written =0;
-//POSIX
-  fh = std::fopen("/home/anthony/file.dat", "w+");
-  Timer timer = Timer(); timer.startTime();
-  for(int i=0; i< count; ++i){
-    bytes_written += std::fwrite(write_buf, sizeof(char), amount*1024*1024, fh);
-    std::fseek(fh, -(amount*1024*1024), SEEK_CUR);
-    bytes_read += std::fread(read_buf, sizeof(char), amount*1024*1024, fh);
-  }
-  timer.endTime("POSIX");
-  std::fclose(fh);
-//IRIS
-  bytes_read =0;
-  bytes_written=0;
-  fh = iris::fopen("file.dat", "w+");
-  timer = Timer(); timer.startTime();
-  for(int i=0; i< count; ++i){
-    bytes_written += iris::fwrite(write_buf, sizeof(char), amount*1024*1024, fh);
-    iris::fseek(fh, -(amount*1024*1024), SEEK_CUR);
-    bytes_read += iris::fread(read_buf, sizeof(char), amount*1024*1024, fh);
-  }
-  timer.endTime("IRIS");
-  iris::fclose(fh);
-
-
-
-  return 0;
 }
 
 
