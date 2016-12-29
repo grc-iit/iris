@@ -65,12 +65,14 @@ int local_tests::read_after_write(size_t writeMB, size_t readMB) {
   bytes_written = iris::fwrite(write_buf, sizeof(char), writeMB* 1024 * 1024,
       fh);
   bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
-                     : std::cout<<"Bytes written: " << bytes_written << std::endl;
+                     : std::cout<<"$$$$$$$$$$$$$$$$$$$$$$ MAIN "
+      "SAYS Bytes written: " << bytes_written << std::endl;
   iris::fclose(fh);
   fh = iris::fopen("file.dat", "r");
   bytes_read = iris::fread(read_buf, sizeof(char), readMB *1024 * 1024, fh);
   bytes_read == 0 ? std::cout <<"File read failed!" <<std::endl
-                  : std::cout<<"Bytes read: " << bytes_read << std::endl;
+                  : std::cout<<"$$$$$$$$$$$$$$$$$$$$$$ MAIN "
+      "SAYS Bytes read: " << bytes_read << std::endl;
   iris::fclose(fh);
   timer.endTime("IRIS");
 

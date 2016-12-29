@@ -38,7 +38,7 @@ POSIXMapper::generateKeys(const char *name, long int offset, size_t size) {
     }
     ++i;
     keys.push_back(key);
-#ifdef DEBUG
+#ifdef DEBUG2
     std::cout << "keyName : " << key.name << "\tOffset : " << key.offset
      <<"\tData Size : " << key.size << std::endl;
 #endif
