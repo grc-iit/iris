@@ -117,9 +117,9 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
   const char * filename = posixMetadataManager->getFilename(stream);
   long int fileOffset = posixMetadataManager->getFpPosition(stream);
   auto filesize = posixMetadataManager->getFilesize(filename);
-    std::future<int> asyncPrefetch =
-            std::async (std::launch::async,&ObjectStorePrefetcher::fetch,
-                        objectStorePrefetcher, filename, fileOffset,operationSize, filesize);
+  std::future<int> asyncPrefetch =
+      std::async (std::launch::async,&ObjectStorePrefetcher::fetch,
+                  objectStorePrefetcher, filename, fileOffset,operationSize, filesize);
 
   auto keys = posixMapper->generateKeys(filename, fileOffset, operationSize);
   objectStoreClient->getRange(keys);
@@ -128,7 +128,7 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
   for (auto&& key : keys) {
       buffer.append(key.data,key.size);
   }
-    ptr=buffer.data();
+  ptr=buffer.data();
   posixMetadataManager->updateMetadataOnRead(stream, operationSize);
   asyncPrefetch.get();
 #ifdef DEBUG
