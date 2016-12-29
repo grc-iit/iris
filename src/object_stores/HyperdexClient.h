@@ -15,6 +15,7 @@
 ******************************************************************************/
 #include <memory>
 #include <vector>
+#include <hyperdex/client.h>
 #include "AbstractObjectStore.h"
 #include "../constants.h"
 #include "../utils/CacheManager.h"
@@ -32,6 +33,16 @@ private:
   struct hyperdex_client* hyperdexClient;
   std::shared_ptr<CacheManager> cacheManager;
   std::shared_ptr<PrefetcherFactory> prefetcherFactory;
+  struct OperationData{
+      int operationType;
+      int completionStatus;
+      Key* key;
+      const hyperdex_client_attribute **attributes;
+      size_t *attributes_sz;
+  };
+  std::unordered_map<int64_t,OperationData> operationToKeyMap;
+  int getKey(int64_t operationId,Key &key);
+  int logRequest(int64_t operationId,const char * OPERATION_TYPE,Key &key,const hyperdex_client_attribute **attributes, size_t *attributes_sz);
 /******************************************************************************
 *Constructor
 ******************************************************************************/
