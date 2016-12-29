@@ -325,7 +325,7 @@ int HyperdexClient::getKey(int64_t operationId, Key &key) {
                     index = operationToKeyMap.find(operationId);
                     if (index->second.operationType == 0) {
                         //GET OPERATION
-                        if(index->second.attributes!= nullptr) {
+                        if(index->second.attributes!= nullptr && (*(index->second.attributes))!= nullptr) {
                             index->second.key->data = new char[(*(index->second.attributes))[0].value_sz];
                             memcpy(index->second.key->data, (*(index->second.attributes))[0].value,
                                    (*(index->second.attributes))[0].value_sz);
@@ -349,19 +349,25 @@ int HyperdexClient::getKey(int64_t operationId, Key &key) {
                     index->second.completionStatus = 1;
                     return OPERATION_SUCCESSFUL;
                 } else {
-                    if (loopId != -1) {
                         index = operationToKeyMap.find(loopId);
-                        if (index->second.operationType == 0) {
+                        if (index->second.operationType == 0 ) {
                             //GET OPERATION
-                            index->second.key->data = (void *) &((*(index->second.attributes))[0].value);
-                            index->second.key->size = (*(index->second.attributes))[0].value_sz;
+                            if(index->second.attributes!= nullptr && (*(index->second.attributes))!= nullptr) {
+                                index->second.key->data = new char[(*(index->second.attributes))[0].value_sz];
+                                memcpy(index->second.key->data, (*(index->second.attributes))[0].value,
+                                       (*(index->second.attributes))[0].value_sz);
+                                index->second.key->size = (*(index->second.attributes))[0].value_sz;
+                            }else{
+#ifdef DEBUG
+                                std::cout << "Get Failed for Key: " << key.name << std::endl;
+#endif
+                            }
                         }
                         index->second.completionStatus = 1;
                         key.name = index->second.key->name;
                         key.size = index->second.key->size;
                         key.data = index->second.key->data;
                     }
-                }
             }
         }
     }

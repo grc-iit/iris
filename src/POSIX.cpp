@@ -126,7 +126,7 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
 
   Buffer buffer = Buffer();
   for (auto&& key : keys) {
-      buffer.append(key.data,key.size);
+      buffer.append(key.data,key.size>strlen((char*)key.data)?strlen((char*)key.data):key.size);
   }
     ptr=buffer.data();
   posixMetadataManager->updateMetadataOnRead(stream, operationSize);
