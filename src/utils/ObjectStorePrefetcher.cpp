@@ -29,7 +29,7 @@ int ObjectStorePrefetcher::fetch(const char *fileName, long int fileOffset,
   Timer timer = Timer(); timer.startTime();
 #endif
 #ifdef DEBUG
-  std::cout << "Inside prefetcher start" << std::endl;
+  std::cout << "####################  PREFETCHER ################" << std::endl;
 #endif/*DEBUG*/
   auto posixMapper = std::static_pointer_cast<POSIXMapper>
       (mapperFactory->getMapper(POSIX_MAPPER));
@@ -40,9 +40,7 @@ int ObjectStorePrefetcher::fetch(const char *fileName, long int fileOffset,
     fetchKeys(keys);
   }
   else return FETCH_FAILED;
-#ifdef DEBUG
-  std::cout << "Inside prefetcher end" << std::endl;
-#endif/*DEBUG*/
+
 #ifdef TIMER
 timer.endTime(__FUNCTION__);
 #endif

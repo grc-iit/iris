@@ -15,7 +15,7 @@
 ******************************************************************************/
 FILE *iris::fopen(const char *filename, const char *mode) {
 #ifdef DEBUG
-  std::cout << "Inside fopen start" << std::endl;
+  std::cout << "####################  FOPEN ####################" << std::endl;
 #endif/*DEBUG*/
   auto apiInstance = API::getInstance();
   auto posixMetadataManager = std::static_pointer_cast<POSIXMetadataManager>
@@ -47,9 +47,6 @@ FILE *iris::fopen(const char *filename, const char *mode) {
     }
     posixMetadataManager->createMetadata(fh, filename, mode);
   }
-#ifdef DEBUG
-  std::cout << "Inside fopen end" << std::endl;
-#endif/*DEBUG*/
   return fh;
 }
 
@@ -57,6 +54,9 @@ FILE *iris::fopen(const char *filename, const char *mode) {
 *fclose
 ******************************************************************************/
 int iris::fclose(FILE *stream) {
+#ifdef DEBUG
+  std::cout << "####################  FCLOSE ###################" << std::endl;
+#endif/*DEBUG*/
   auto apiInstance = API::getInstance();
   auto posixMetadataManager = std::static_pointer_cast<POSIXMetadataManager>
       (apiInstance->getMetadataManagerFactory()->
@@ -68,9 +68,7 @@ int iris::fclose(FILE *stream) {
     std::fclose(stream);
     posixMetadataManager->updateMetadataOnClose(stream, filename);
   }
-#ifdef DEBUG
-  std::cout << "Inside fclose end" << std::endl;
-#endif/*DEBUG*/
+
   return 0;
 }
 
@@ -78,6 +76,9 @@ int iris::fclose(FILE *stream) {
 *fseek
 ******************************************************************************/
 int iris::fseek(FILE *stream, long int offset, int origin) {
+#ifdef DEBUG
+  std::cout << "####################  FSEEK ####################" << std::endl;
+#endif/*DEBUG*/
   auto apiInstance = API::getInstance();
   auto posixMetadataManager = std::static_pointer_cast<POSIXMetadataManager>
       (apiInstance->getMetadataManagerFactory()->
@@ -91,6 +92,9 @@ int iris::fseek(FILE *stream, long int offset, int origin) {
 *fread
 ******************************************************************************/
 size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream) {
+#ifdef DEBUG
+  std::cout << "####################  FREAD ####################" << std::endl;
+#endif/*DEBUG*/
 #ifdef TIMER
   Timer timer = Timer(); timer.startTime();
 #endif
@@ -117,23 +121,23 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
   const char * filename = posixMetadataManager->getFilename(stream);
   long int fileOffset = posixMetadataManager->getFpPosition(stream);
   auto filesize = posixMetadataManager->getFilesize(filename);
-    std::future<int> asyncPrefetch =
-            std::async (std::launch::async,&ObjectStorePrefetcher::fetch,
-                        objectStorePrefetcher, filename, fileOffset,operationSize, filesize);
+
 
   auto keys = posixMapper->generateKeys(filename, fileOffset, operationSize);
   objectStoreClient->getRange(keys);
+  std::future<int> asyncPrefetch =
+      std::async (std::launch::async,&ObjectStorePrefetcher::fetch,
+                  objectStorePrefetcher, filename, fileOffset,operationSize, filesize);
 
   Buffer buffer = Buffer();
   for (auto&& key : keys) {
-      buffer.append(key.data,key.size>strlen((char*)key.data)?strlen((char*)key.data):key.size);
+      buffer.append(key.data,
+                    key.size>strlen((char*)key.data)?strlen((char*)key.data)
+                                                    :key.size);
   }
-    ptr=buffer.data();
+  ptr=buffer.data();
   posixMetadataManager->updateMetadataOnRead(stream, operationSize);
   asyncPrefetch.get();
-#ifdef DEBUG
-  std::cout << "Inside fread end" << std::endl;
-#endif/*DEBUG*/
 #ifdef TIMER
   timer.endTime(__FUNCTION__);
 #endif
@@ -143,6 +147,9 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
 *fwrite
 ******************************************************************************/
 size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
+#ifdef DEBUG
+  std::cout << "####################  FWRITE ###################" << std::endl;
+#endif/*DEBUG*/
 #ifdef TIMER
   Timer timer = Timer(); timer.startTime();
 #endif
@@ -177,9 +184,6 @@ size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
   }
   objectStoreClient->putRange(keys);
   posixMetadataManager->updateMetadataOnWrite(stream, operationSize);
-#ifdef DEBUG
-  std::cout << "Inside fwrite end" << std::endl;
-#endif/*DEBUG*/
 #ifdef TIMER
   timer.endTime(__FUNCTION__);
 #endif

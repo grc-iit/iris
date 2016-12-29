@@ -42,7 +42,11 @@ private:
   };
   std::unordered_map<int64_t,OperationData> operationToKeyMap;
   int getKey(int64_t operationId,Key &key);
-  int logRequest(int64_t operationId,const char * OPERATION_TYPE,Key &key,const hyperdex_client_attribute **attributes, size_t *attributes_sz);
+  int logRequest(int64_t operationId,
+                 const char * OPERATION_TYPE,
+                 Key &key,
+                 const hyperdex_client_attribute **attributes,
+                 size_t *attributes_sz);
 /******************************************************************************
 *Constructor
 ******************************************************************************/
