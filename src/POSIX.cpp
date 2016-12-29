@@ -134,7 +134,7 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
 #ifdef DEBUG2
   std::printf("Reading Data %-20s \n", (char*)ptr );
 #endif
-  /*asyncOperation= std::async (std::launch::async,&ObjectStorePrefetcher::fetch,
+/*  asyncOperation= std::async (std::launch::async,&ObjectStorePrefetcher::fetch,
                   objectStorePrefetcher, filename, fileOffset,operationSize, filesize);*/
   objectStorePrefetcher->fetch(filename, fileOffset, operationSize, filesize);
   posixMetadataManager->updateMetadataOnRead(stream, operationSize);
