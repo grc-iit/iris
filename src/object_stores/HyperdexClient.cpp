@@ -47,8 +47,8 @@ int HyperdexClient::get(Key &key) {
                                 &op_status,
                                 &attributes,
                                 &attributes_sz);
-    logRequest(op_id,GET_OPERATION,key,&attributes,&attributes_sz);
-    int status=getKey(op_id,key);
+    logRequest(op_id, GET_OPERATION, key, &attributes, &attributes_sz);
+    int status = getKey(op_id, key);
     hyperdex_client_destroy_attrs(attributes, attributes_sz);
 #ifdef TIMER
     timer.endTime(__FUNCTION__);
@@ -104,8 +104,8 @@ int HyperdexClient::put(Key &key) {
                                 &attribute,
                                 attribute_sz,
                                 &op_status);
-    logRequest(op_id,PUT_OPERATION,key, nullptr,0);
-    status=getKey(op_id,key);
+    logRequest(op_id, PUT_OPERATION, key, nullptr, 0);
+    status = getKey(op_id, key);
 #ifdef TIMER
     timer.endTime(__FUNCTION__);
 #endif
@@ -127,20 +127,21 @@ int HyperdexClient::getRange(std::vector<Key> &keys) {
     std::future<int> asyncFetch;
     for (int i = 0; i < keys.size(); ++i) {
         if (cacheManager->isCached(keys[i]) != OPERATION_SUCCESSFUL) {
-            if (i + 1 < keys.size())
+            if (i + 1 < keys.size()) {
                 asyncFetch = std::async(std::launch::async,
-                                         &ObjectStorePrefetcher::fetchKey,
-                                        objectStorePrefetcher, keys[i+1]);
-                op_id[i] = hyperdex_client_get(hyperdexClient,
-                                               SPACE,
-                                               keys[i].name,
-                                               strlen(keys[i].name),
-                                               &op_status[i],
-                                               &attributes[i],
-                                               &attributes_sz[i]);
+                                        &ObjectStorePrefetcher::fetchKey,
+                                        objectStorePrefetcher, keys[i + 1]);
+            }
+            op_id[i] = hyperdex_client_get(hyperdexClient,
+                                           SPACE,
+                                           keys[i].name,
+                                           strlen(keys[i].name),
+                                           &op_status[i],
+                                           &attributes[i],
+                                           &attributes_sz[i]);
             logRequest(op_id[i], GET_OPERATION, keys[i], &attributes[i], &attributes_sz[i]);
             loopCounter[i] = true;
-            if(i+1 < keys.size()) asyncFetch.get();
+            if (i + 1 < keys.size()) asyncFetch.get();
         }
     }
     for (int i = 0; i < keys.size() && loopCounter[i]; i++) {
@@ -297,90 +298,84 @@ int HyperdexClient::init() {
     return OPERATION_SUCCESSFUL;
 }
 
-int HyperdexClient::getKey(int64_t operationId, Key &key) {
+int HyperdexClient::getKeyFromMap(int64_t operationId, Key &key) {
     auto index = operationToKeyMap.find(operationId);
-    if (index == operationToKeyMap.end()) return -1;
-    else {
-        if (index->second.completionStatus == 1) {
-            key.name = index->second.key->name;
-            key.size = index->second.key->size;
-            key.data = index->second.key->data;
-            #ifdef DEBUG
-            if(index->second.operationType==1) {
+    key.name = index->second.key->name;
+    key.size = index->second.key->size;
+    key.data = index->second.key->data;
+#ifdef DEBUG
+    if(index->second.operationType==1) {
                 std::cout << "Put Key: " << key.name << std::endl;
             }else{
                 std::cout << "Get Key: " << key.name << std::endl;
             }
-            #endif /* DEBUG*/
-            return OPERATION_SUCCESSFUL;
-        } else {
-            enum hyperdex_client_returncode loop_status;
-            int found = 0;
-            while (found == 0) {
-                int64_t loopId = hyperdex_client_loop(hyperdexClient, -1, &loop_status);
-                if(loopId==-1){
-                    index = operationToKeyMap.find(operationId);
-                    if (index->second.completionStatus == 1) {
-                        key.name = index->second.key->name;
-                        key.size = index->second.key->size;
-                        key.data = index->second.key->data;
-#ifdef DEBUG
-                        if(index->second.operationType==1) {
-                            std::cout << "Put Key: " << key.name << std::endl;
-                        }else{
-                            std::cout << "Get Key: " << key.name << std::endl;
-                        }
 #endif /* DEBUG*/
-                        return OPERATION_SUCCESSFUL;
+    operationToKeyMap.erase(operationId);
+    return OPERATION_SUCCESSFUL;
+}
+
+int HyperdexClient::getKey(int64_t operationId, Key &key) {
+#ifdef TIMER
+    Timer timer = Timer(); timer.startTime();
+#endif
+    auto index = operationToKeyMap.find(operationId);
+    if (index->second.completionStatus == 1) {
+#ifdef TIMER
+        timer.endTime(__FUNCTION__);
+#endif
+        return getKeyFromMap(operationId, key);
+    } else {
+        while (index->second.completionStatus != 1) {
+            enum hyperdex_client_returncode loop_status;
+            int64_t loopId = hyperdex_client_loop(hyperdexClient, -1, &loop_status);
+            if (loopId == -1) {
+#ifdef TIMER
+                timer.endTime(__FUNCTION__);
+#endif
+                return getKeyFromMap(operationId, key);
+            } else if (loopId == operationId) {
+                if (index->second.operationType == 0) {
+                    //GET OPERATION
+                    if (index->second.attributes != nullptr && (*(index->second.attributes)) != nullptr) {
+                        index->second.key->data = (void*)(*(index->second.attributes))[0].value;
+                        index->second.key->size = strlen((*(index->second.attributes))[0].value);
+                    } else {
+#ifdef DEBUG
+                        std::cout << "Get Failed for Key: " << key.name << std::endl;
+#endif
                     }
                 }
-                if (loopId == operationId) {
-                    index = operationToKeyMap.find(operationId);
-                    if (index->second.operationType == 0) {
-                        //GET OPERATION
-                        if(index->second.attributes!= nullptr && (*(index->second.attributes))!= nullptr) {
-                            index->second.key->data = new char[(*(index->second.attributes))[0].value_sz];
-                            memcpy(index->second.key->data, (*(index->second.attributes))[0].value,
-                                   (*(index->second.attributes))[0].value_sz);
-                            index->second.key->size = (*(index->second.attributes))[0].value_sz;
-                        }else{
 #ifdef DEBUG
-                            std::cout << "Get Failed for Key: " << key.name << std::endl;
-#endif
-                        }
-                    }
-#ifdef DEBUG
-                    if(index->second.operationType==1) {
+                if(index->second.operationType==1) {
                         std::cout << "Put Key: " << key.name << std::endl;
                     }else{
                         std::cout << "Get Key: " << key.name << std::endl;
                     }
 #endif
-                    key.name = index->second.key->name;
-                    key.size = index->second.key->size;
-                    key.data = index->second.key->data;
-                    index->second.completionStatus = 1;
-                    return OPERATION_SUCCESSFUL;
-                } else {
-                        index = operationToKeyMap.find(loopId);
-                        if (index->second.operationType == 0 ) {
-                            //GET OPERATION
-                            if(index->second.attributes!= nullptr && (*(index->second.attributes))!= nullptr) {
-                                index->second.key->data = new char[(*(index->second.attributes))[0].value_sz];
-                                memcpy(index->second.key->data, (*(index->second.attributes))[0].value,
-                                       (*(index->second.attributes))[0].value_sz);
-                                index->second.key->size = (*(index->second.attributes))[0].value_sz;
-                            }else{
-#ifdef DEBUG
-                                std::cout << "Get Failed for Key: " << key.name << std::endl;
+
+                index->second.completionStatus = 1;
+                getKeyFromMap(operationId,key);
+#ifdef TIMER
+                timer.endTime(__FUNCTION__);
 #endif
-                            }
-                        }
-                        index->second.completionStatus = 1;
-                        key.name = index->second.key->name;
-                        key.size = index->second.key->size;
-                        key.data = index->second.key->data;
+                return OPERATION_SUCCESSFUL;
+            } else {
+                index = operationToKeyMap.find(loopId);
+                if (index->second.operationType == 0) {
+                    //GET OPERATION
+                    if (index->second.attributes != nullptr && (*(index->second.attributes)) != nullptr) {
+                        index->second.key->data = (void*)(*(index->second.attributes))[0].value;
+                        index->second.key->size =(*(index->second.attributes))[0].value_sz;
+                    } else {
+#ifdef DEBUG
+                        std::cout << "Get Failed for Key: " << key.name << std::endl;
+#endif
                     }
+                }
+                index->second.completionStatus = 1;
+                key.name = index->second.key->name;
+                key.size = index->second.key->size;
+                key.data = index->second.key->data;
             }
         }
     }
@@ -389,9 +384,12 @@ int HyperdexClient::getKey(int64_t operationId, Key &key) {
 
 int HyperdexClient::logRequest(int64_t operationId, const char *OPERATION_TYPE, Key &key,
                                const hyperdex_client_attribute **attributes, size_t *attributes_sz) {
+#ifdef TIMER
+    Timer timer1 = Timer(); timer1.startTime();
+#endif
     OperationData data;
     data.completionStatus = 0;
-    if (std::strcmp(OPERATION_TYPE, GET_OPERATION)==0) {
+    if (std::strcmp(OPERATION_TYPE, GET_OPERATION) == 0) {
         data.operationType = 0;
     } else {
         data.operationType = 1;

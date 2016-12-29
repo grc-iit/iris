@@ -73,6 +73,8 @@ public:
 *Destructor
 ******************************************************************************/
   virtual ~HyperdexClient();
+
+    int getKeyFromMap(int64_t operationId, Key &key);
 };
 
 #endif //IRIS_HYPERDEXCLIENT_H
