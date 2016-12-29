@@ -48,6 +48,7 @@ private:
   std::shared_ptr<MetadataManagerFactory> metadataManagerFactory;
   std::shared_ptr<MapperFactory> mapperFactory;
   std::shared_ptr<ObjectStoreFactory> objectStoreFactory;
+
 /******************************************************************************
 *Constructors
 ******************************************************************************/

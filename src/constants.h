@@ -16,6 +16,7 @@
 #include <cstring>
 #include <sys/types.h>
 #include <string>
+#include <future>
 #include "return_codes.h"
 /******************************************************************************
 *Iris library parameters
@@ -29,6 +30,7 @@ static const char * PUT_OPERATION = "PUT";
 static const u_int16_t MAX_KEY_LENGTH = 32;
 static const size_t MAX_OBJ_SIZE = (512*1024);
 static const u_int64_t CACHE_CAPACITY = 1073741824;
+static std::future<int> asyncOperation;
 /******************************************************************************
 *Prefetcher
 ******************************************************************************/

@@ -95,6 +95,7 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
 #ifdef DEBUG
   std::cout << "####################  FREAD ####################" << std::endl;
 #endif/*DEBUG*/
+  if(asyncOperation.valid()) asyncOperation.get();
 #ifdef TIMER
   Timer timer = Timer(); timer.startTime();
 #endif
@@ -102,42 +103,41 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
 #ifdef RELEASE
   if(operationSize == 0) return 0;
 #endif /*RELEASE*/
-#ifdef TIMER
-  Timer timer1 = Timer(); timer1.startTime();
-#endif
+
   auto apiInstance = API::getInstance();
+
   auto posixMetadataManager = std::static_pointer_cast<POSIXMetadataManager>
       (apiInstance->getMetadataManagerFactory()->
           getMetadataManager(POSIX_METADATA_MANAGER));
-  auto objectStorePrefetcher = std::static_pointer_cast<ObjectStorePrefetcher>
-      (apiInstance->getPrefetcherFactory()->getPrefetcher(OBJECTSTORE_PREFETCHER));
   auto posixMapper = std::static_pointer_cast<POSIXMapper>
       (apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER));
+  auto cacheManager = apiInstance->getCacheManager();
+  auto objectStorePrefetcher = std::static_pointer_cast<ObjectStorePrefetcher>
+      (apiInstance->getPrefetcherFactory()->getPrefetcher(OBJECTSTORE_PREFETCHER));
   auto objectStoreClient = std::static_pointer_cast<HyperdexClient>
       (apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT));
-#ifdef TIMER
-  timer1.endTime("FREAD_INIT");
-#endif
+
+
   const char * filename = posixMetadataManager->getFilename(stream);
   long int fileOffset = posixMetadataManager->getFpPosition(stream);
   auto filesize = posixMetadataManager->getFilesize(filename);
-
-
   auto keys = posixMapper->generateKeys(filename, fileOffset, operationSize);
-  objectStoreClient->getRange(keys);
-  std::future<int> asyncPrefetch =
-      std::async (std::launch::async,&ObjectStorePrefetcher::fetch,
-                  objectStorePrefetcher, filename, fileOffset,operationSize, filesize);
 
-  Buffer buffer = Buffer();
+  Buffer buffer = Buffer(ptr);
+  size_t bufferIndex = 0;
   for (auto&& key : keys) {
-      buffer.append(key.data,
-                    key.size>strlen((char*)key.data)?strlen((char*)key.data)
-                                                    :key.size);
+    auto originalKeySize = key.size;
+    if(cacheManager->isCached(key) == NO_DATA_FOUND) objectStoreClient->get(key);
+    buffer.update(key.data,bufferIndex,originalKeySize);
+    bufferIndex+=originalKeySize;
   }
-  ptr=buffer.data();
+#ifdef DEBUG2
+  std::printf("Reading Data %-20s \n", (char*)ptr );
+#endif
+  /*asyncOperation= std::async (std::launch::async,&ObjectStorePrefetcher::fetch,
+                  objectStorePrefetcher, filename, fileOffset,operationSize, filesize);*/
+  objectStorePrefetcher->fetch(filename, fileOffset, operationSize, filesize);
   posixMetadataManager->updateMetadataOnRead(stream, operationSize);
-  asyncPrefetch.get();
 #ifdef TIMER
   timer.endTime(__FUNCTION__);
 #endif
@@ -155,34 +155,31 @@ size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
 #endif
   auto operationSize = size * count;
   if(operationSize == 0) return 0;
-#ifdef TIMER
-  Timer timer1 = Timer(); timer1.startTime();
-#endif
+
   auto apiInstance = API::getInstance();
   auto posixMetadataManager = std::static_pointer_cast<POSIXMetadataManager>
       (apiInstance->getMetadataManagerFactory()->
           getMetadataManager(POSIX_METADATA_MANAGER));
   auto posixMapper = std::static_pointer_cast<POSIXMapper>
-          (apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER));
+      (apiInstance->getMapperFactory()->getMapper(POSIX_MAPPER));
+  auto cacheManager = apiInstance->getCacheManager();
   auto objectStoreClient = std::static_pointer_cast<HyperdexClient>
-          (apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT));
-#ifdef TIMER
-  timer1.endTime("FWRITE_INIT");
-#endif
+      (apiInstance->getObjectStoreFactory()->getObjectStore(HYPERDEX_CLIENT));
+
   const char *filename = posixMetadataManager->getFilename(stream);
   if(!posixMetadataManager->checkIfFileIsOpen(filename)) return 0;
 
   long int fileOffset = posixMetadataManager->getFpPosition(stream);
 
   auto keys = posixMapper->generateKeys(filename, fileOffset, operationSize);
-
   std::size_t bufferIndex = 0;
   for (auto &&key : keys) {
-    key.data = malloc(key.size);
+    key.data=malloc(key.size);
     memcpy(key.data,(char*)ptr + bufferIndex,key.size);
+    objectStoreClient->put(key);
+    if(CACHING_MODE == "ON") cacheManager->addToCache(key);
     bufferIndex += key.size;
   }
-  objectStoreClient->putRange(keys);
   posixMetadataManager->updateMetadataOnWrite(stream, operationSize);
 #ifdef TIMER
   timer.endTime(__FUNCTION__);

@@ -16,7 +16,7 @@ void Timer::endTime(std::string fnName) {
       t2 - t1).count()/1000000.0;
   if( t > 0.001){
     std::cout << fnName << "() "
-              << std::setprecision(2) << t
+              << std::setprecision(6) << t
               << " ms\n";
   }
 

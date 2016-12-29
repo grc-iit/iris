@@ -36,8 +36,8 @@ int HyperdexClient::get(Key &key) {
 #ifdef TIMER
     Timer timer = Timer(); timer.startTime();
 #endif
-    int64_t op_id = 0, loop_id = 0;
-    const struct hyperdex_client_attribute *attributes = 0;
+    int64_t op_id=0, loop_id=0;
+    const struct hyperdex_client_attribute* attributes = 0;
     std::size_t attributes_sz = 0;
     enum hyperdex_client_returncode op_status, loop_status;
     op_id = hyperdex_client_get(hyperdexClient,
@@ -47,13 +47,28 @@ int HyperdexClient::get(Key &key) {
                                 &op_status,
                                 &attributes,
                                 &attributes_sz);
-    logRequest(op_id, GET_OPERATION, key, &attributes, &attributes_sz);
-    int status = getKey(op_id, key);
-    hyperdex_client_destroy_attrs(attributes, attributes_sz);
+    loop_id = hyperdex_client_loop(hyperdexClient, -1, &loop_status);
+    if (op_id == loop_id && loop_status == HYPERDEX_CLIENT_SUCCESS && attributes_sz!=0){
+        key.data=malloc(attributes[0].value_sz);
+        memcpy(key.data, attributes[0].value, attributes[0].value_sz);
+        key.size = attributes[0].value_sz;
+    }else{
+#ifdef DEBUG
+        std::cout << "Key: " << key.name << std::endl;
+        fprintf(stderr, "Get FAILED! \nOP ID: %ld, STAT: %d, LOOP ID: %ld, STAT:"
+            " %d\n", op_id, op_status, loop_id, loop_status);
+#endif /* DEBUG*/
+        return HYPERDEX_GET_OPERATION_FAILED;
+    }
+#ifdef DEBUG
+    std::cout << "Get operation complete" << std::endl;
+    std::cout << "Key: " << key.name << std::endl;
+#endif /* DEBUG*/
+    hyperdex_client_destroy_attrs(attributes,attributes_sz);
 #ifdef TIMER
     timer.endTime(__FUNCTION__);
 #endif
-    return status;
+    return OPERATION_SUCCESSFUL;
 }
 
 int HyperdexClient::put(Key &key) {
@@ -68,22 +83,22 @@ int HyperdexClient::put(Key &key) {
     Key originalKey = key;
     Buffer dataBuffer;
 
-    if (key.offset == 0) {
-        if (key.size != MAX_OBJ_SIZE) {
+    if(key.offset == 0){
+        if(key.size != MAX_OBJ_SIZE){
             status = get(key);
-            if (status == OPERATION_SUCCESSFUL && key.size > originalKey.size) {
-                dataBuffer = Buffer(key.data, key.size);
+            if(status == OPERATION_SUCCESSFUL && key.size > originalKey.size){
+                dataBuffer = Buffer(key.data,key.size);
                 dataBuffer.assign(originalKey.data, originalKey.size);
                 key.data = dataBuffer.data();
             }
         }
-    } else {
+    }else{
         status = get(key);
-        if (status == OPERATION_SUCCESSFUL) {
-            if (key.size > originalKey.offset + originalKey.size) {
-                std::memcpy((char *) key.data + originalKey.offset, originalKey.data,
+        if(status == OPERATION_SUCCESSFUL) {
+            if (key.size > originalKey.offset + originalKey.size){
+                std::memcpy((char*)key.data + originalKey.offset, originalKey.data,
                             originalKey.size);
-            } else {
+            } else{
                 dataBuffer = Buffer(key.data, originalKey.offset);
                 dataBuffer.append(originalKey.data);
                 key.data = dataBuffer.data();
@@ -92,8 +107,8 @@ int HyperdexClient::put(Key &key) {
     }
     /*Prepare parameters for th actual put call on Hyperdex*/
     std::size_t attribute_sz = 1;
-    attribute.attr = ATTRIBUTE_NAME;
-    attribute.datatype = HYPERDATATYPE_STRING;
+    attribute.attr =ATTRIBUTE_NAME;
+    attribute.datatype=HYPERDATATYPE_STRING;
     attribute.value = (const char *) key.data;
     attribute.value_sz = key.size;
 
@@ -104,12 +119,22 @@ int HyperdexClient::put(Key &key) {
                                 &attribute,
                                 attribute_sz,
                                 &op_status);
-    logRequest(op_id, PUT_OPERATION, key, nullptr, 0);
-    status = getKey(op_id, key);
+    loop_id = hyperdex_client_loop(hyperdexClient, -1, &loop_status);
+    if (loop_id != op_id || loop_status != HYPERDEX_CLIENT_SUCCESS) {
+#ifdef DEBUG
+        fprintf(stderr, "PUT FAILED! \nOP ID: %ld, STAT: %d, LOOP ID: %ld, STAT:"
+            " %d\n", op_id, op_status, loop_id, loop_status);
+#endif /* DEBUG*/
+        return HYPERDEX_PUT_OPERATION_FAILED;
+    }
+#ifdef DEBUG
+    std::cout << "Put operation complete" << std::endl;
+    std::cout << "Key: " << key.name << std::endl;
+#endif /* DEBUG*/
 #ifdef TIMER
     timer.endTime(__FUNCTION__);
 #endif
-    return status;
+    return OPERATION_SUCCESSFUL;
 }
 
 int HyperdexClient::getRange(std::vector<Key> &keys) {
@@ -345,14 +370,6 @@ int HyperdexClient::getKey(int64_t operationId, Key &key) {
 #endif
                     }
                 }
-#ifdef DEBUG
-                if(index->second.operationType==1) {
-                        std::cout << "Put Key: " << key.name << std::endl;
-                    }else{
-                        std::cout << "Get Key: " << key.name << std::endl;
-                    }
-#endif
-
                 index->second.completionStatus = 1;
                 getKeyFromMap(operationId,key);
 #ifdef TIMER

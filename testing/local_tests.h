@@ -12,6 +12,7 @@ public:
   static int simple_open_close(int repetitions);
   static int read_after_write(size_t writeMB, size_t readMB);
   static int multiple_reads(size_t writeMB, size_t readMB);
+  static int alternateReadandWrite(size_t amount, int count);
   //int random_writes();
 
   //int random_reads();
