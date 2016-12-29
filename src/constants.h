@@ -27,7 +27,7 @@ static const char * CACHING_MODE = "ON"; // "ON" - "OFF"
 static const char * GET_OPERATION = "GET";
 static const char * PUT_OPERATION = "PUT";
 static const u_int16_t MAX_KEY_LENGTH = 32;
-static const size_t MAX_OBJ_SIZE = (2*1024*1024);
+static const size_t MAX_OBJ_SIZE = (20*1024);
 static const u_int64_t CACHE_CAPACITY = 1073741824;
 /******************************************************************************
 *Prefetcher
