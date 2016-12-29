@@ -319,7 +319,20 @@ int HyperdexClient::getKey(int64_t operationId, Key &key) {
             while (found == 0) {
                 int64_t loopId = hyperdex_client_loop(hyperdexClient, -1, &loop_status);
                 if(loopId==-1){
-                    return getKey(operationId,key);
+                    index = operationToKeyMap.find(operationId);
+                    if (index->second.completionStatus == 1) {
+                        key.name = index->second.key->name;
+                        key.size = index->second.key->size;
+                        key.data = index->second.key->data;
+#ifdef DEBUG
+                        if(index->second.operationType==1) {
+                            std::cout << "Put Key: " << key.name << std::endl;
+                        }else{
+                            std::cout << "Get Key: " << key.name << std::endl;
+                        }
+#endif /* DEBUG*/
+                        return OPERATION_SUCCESSFUL;
+                    }
                 }
                 if (loopId == operationId) {
                     index = operationToKeyMap.find(operationId);
