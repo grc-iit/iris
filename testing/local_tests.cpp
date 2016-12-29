@@ -170,14 +170,14 @@ char *local_tests::randstring(std::size_t length) {
 
 int local_tests::alternateReadandWrite(size_t amount, int count) {
   std::cout << "Alternate TEST\n" <<std::endl;
-  char * write_buf = randstring(amount);
-  char *read_buf = (char *) malloc(amount);
+  char * write_buf = randstring(amount*1024*1024);
+  char *read_buf = (char *) malloc(amount*1024*1024);
 
   FILE* fh;
   size_t bytes_read=0;
   size_t bytes_written =0;
 //POSIX
-  fh = std::fopen("/home/anthony/temp/file.dat", "w+");
+  fh = std::fopen("/home/admin2/file.dat", "w+");
   Timer timer = Timer(); timer.startTime();
   for(int i=0; i< count; ++i){
     bytes_written += std::fwrite(write_buf, sizeof(char), amount*1024*1024, fh);
