@@ -17,7 +17,7 @@ POSIXMapper::generateKeys(const char *name, long int offset, size_t size) {
   std::size_t keySize = strlen(name)+ sizeof(char) + sizeof(baseKey);
   Key key;
   while(remainingOperationSize!=0) {
-    key.name = new char[keySize];//(char *) std::malloc(keySize);
+    key.name = new char[keySize];
     std::size_t baseOffset = ((baseKey + i) * MAX_OBJ_SIZE);
     std::sprintf((char*)key.name, "%s_%ld", name, (baseKey + i));
     if (offset == baseOffset) {
@@ -36,11 +36,12 @@ POSIXMapper::generateKeys(const char *name, long int offset, size_t size) {
       remainingOperationSize -= key.size;
       offset += key.size;
     }
-#ifdef DEBUG
-    std::cout<< "keyName : " << key.name << "\tOffset : " << key.offset <<"\tData Size : " << key.size <<std::endl;
-#endif
     ++i;
     keys.push_back(key);
+#ifdef DEBUG
+    std::cout << "keyName : " << key.name << "Offset : " << key.offset
+     <<"Data Size : " << key.size << std::endl;
+#endif
   }
   return keys;
 }

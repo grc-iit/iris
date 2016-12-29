@@ -17,6 +17,9 @@
 #include <vector>
 #include "AbstractObjectStore.h"
 #include "../constants.h"
+#include "../utils/CacheManager.h"
+#include "../utils/PrefetcherFactory.h"
+
 /******************************************************************************
 *Class
 ******************************************************************************/
@@ -27,6 +30,8 @@ private:
 ******************************************************************************/
   static std::shared_ptr<HyperdexClient> instance;
   struct hyperdex_client* hyperdexClient;
+  std::shared_ptr<CacheManager> cacheManager;
+  std::shared_ptr<PrefetcherFactory> prefetcherFactory;
 /******************************************************************************
 *Constructor
 ******************************************************************************/
@@ -51,9 +56,8 @@ public:
   int put(Key &key) override;
   int remove(Key &key) override;
 /* Hyperdex specific calls*/
-  int getRange(std::vector<Key> keys);
-  /*TODO:
-  int put_range(std::vector<Key> keys);*/
+  int getRange(std::vector<Key> &keys);
+  int putRange(std::vector<Key> &keys);
 /******************************************************************************
 *Destructor
 ******************************************************************************/

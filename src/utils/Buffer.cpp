@@ -95,12 +95,7 @@ Buffer::~Buffer()
 ******************************************************************************/
 void Buffer::update(const void *data, Buffer::size_type offset,
                     Buffer::size_type size) {
-  if(offset+size <= size_){
-    //char * index = reinterpret_cast<char*> (data_);
-    //index+= offset;
-    std::memcpy (data_+offset, data, size);
-
-  }
+  if(offset+size <= size_) std::memcpy(data_+offset, data, size);
 }
 
 

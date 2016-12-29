@@ -50,6 +50,8 @@ public:
 ******************************************************************************/
   int fetch(const char *fileName, long int fileOffset, size_t operationSize,
             long int fileSize);
+  int fetchKey(Key key);
+  int fetchKeys(std::vector<Key> keys);
 };
 
 

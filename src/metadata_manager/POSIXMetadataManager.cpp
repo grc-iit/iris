@@ -1,8 +1,12 @@
 /******************************************************************************
 *include files
 ******************************************************************************/
+#include <chrono>
+#include <iostream>
 #include "POSIXMetadataManager.h"
 #include "../constants.h"
+#include "../utils/Timer.h"
+
 /******************************************************************************
 *Constructor
 ******************************************************************************/
@@ -21,6 +25,9 @@ POSIXMetadataManager::~POSIXMetadataManager() {
 *Interface
 ******************************************************************************/
 bool POSIXMetadataManager::checkIfFileExists(const char * filename) {
+#ifdef TIMER
+  Timer timer = Timer(); timer.startTime();
+#endif
   //Error checks
 #ifdef RELEASE
   /*Check if the filename is longer than allowed (<256)*/
@@ -31,10 +38,16 @@ bool POSIXMetadataManager::checkIfFileExists(const char * filename) {
 #endif /*RELEASE*/
   /* Check if the filename exists in the map of the created files*/
   auto iterator = created_files.find(filename);
+#ifdef TIMER
+  timer.endTime(__FUNCTION__);
+#endif
   return !(iterator == created_files.end());
 }
 
 bool POSIXMetadataManager::checkIfFileIsOpen(const char *filename) {
+#ifdef TIMER
+  Timer timer = Timer(); timer.startTime();
+#endif
   //Error checks
 #ifdef RELEASE
   /*Check if the filename is longer than allowed (<256)*/
@@ -46,6 +59,9 @@ bool POSIXMetadataManager::checkIfFileIsOpen(const char *filename) {
   if(checkIfFileExists(filename)) {
     /* Check if the file has been previously been opened*/
     auto iterator = created_files.find(filename);
+#ifdef TIMER
+    timer.endTime(__FUNCTION__);
+#endif
     return iterator == created_files.end() ?
            false : created_files[filename].opened;
   }
@@ -58,17 +74,26 @@ bool POSIXMetadataManager::checkIfFileIsOpen(const char *filename) {
 }
 
 const char *POSIXMetadataManager::getFilename(FILE *fh) {
+#ifdef TIMER
+  Timer timer = Timer(); timer.startTime();
+#endif
   //Error checks
 #ifdef RELEASE
   if(fh == nullptr) return nullptr;
 #endif /*RELEASE*/
   auto iterator = fh2filename.find(fh);
+#ifdef TIMER
+  timer.endTime(__FUNCTION__);
+#endif
   if(iterator == fh2filename.end()) return nullptr;
   else return iterator->second; //holds the filename
 }
 
 int POSIXMetadataManager::createMetadata(FILE * fh, const char * filename,
                                          const char* mode) {
+#ifdef TIMER
+  Timer timer = Timer(); timer.startTime();
+#endif
   //Error checks
 #ifdef RELEASE
   if(fh == nullptr || std::strlen(filename) > MAX_FILENAME_LENGTH)
@@ -95,11 +120,17 @@ int POSIXMetadataManager::createMetadata(FILE * fh, const char * filename,
   created_files.insert(std::make_pair(filename,file_metadata));
   fh2filename.insert(std::make_pair(fh, filename));
   pointer.insert(std::make_pair(fh,0));
+#ifdef TIMER
+  timer.endTime(__FUNCTION__);
+#endif
   return OPERATION_SUCCESSFUL;
 }
 
 int POSIXMetadataManager::updateMetadataOnOpen(FILE * fh, const char * filename,
                                                const char* mode) {
+#ifdef TIMER
+  Timer timer = Timer(); timer.startTime();
+#endif
   //Error checks
 #ifdef RELEASE
   if(fh == nullptr || std::strlen(filename) > MAX_FILENAME_LENGTH)
@@ -124,10 +155,16 @@ int POSIXMetadataManager::updateMetadataOnOpen(FILE * fh, const char * filename,
                                   0};
   fh2filename.insert(std::make_pair(fh, filename));
   pointer.insert(std::make_pair(fh,0));
+#ifdef TIMER
+  timer.endTime(__FUNCTION__);
+#endif
   return OPERATION_SUCCESSFUL;
 }
 
 int POSIXMetadataManager::updateMetadataOnClose(FILE * fh, const char * filename) {
+#ifdef TIMER
+  Timer timer = Timer(); timer.startTime();
+#endif
   //Error checks
 #ifdef RELEASE
   if(fh == nullptr || std::strlen(filename) > MAX_FILENAME_LENGTH)
@@ -140,10 +177,16 @@ int POSIXMetadataManager::updateMetadataOnClose(FILE * fh, const char * filename
   else created_files[filename].opened = false;
   fh2filename.erase(fh);
   pointer.erase(fh);
+#ifdef TIMER
+  timer.endTime(__FUNCTION__);
+#endif
   return OPERATION_SUCCESSFUL;
 }
 
 int POSIXMetadataManager::updateMetadataOnRead(FILE *fh, std::size_t operationSize) {
+#ifdef TIMER
+  Timer timer = Timer(); timer.startTime();
+#endif
   //Error checks
 #ifdef RELEASE
   if(fh == nullptr || operationSize == 0) return METADATA_UPDATE_FAILED__READ;
@@ -154,11 +197,17 @@ int POSIXMetadataManager::updateMetadataOnRead(FILE *fh, std::size_t operationSi
 #endif /*RELEASE*/
   if(strcmp(POSIX_MODE,"STRICT")==0) created_files[filename].atime = time(NULL);
   updateFpPosition(fh, operationSize, SEEK_CUR, filename);
+#ifdef TIMER
+  timer.endTime(__FUNCTION__);
+#endif
   return OPERATION_SUCCESSFUL;
 }
 
 int POSIXMetadataManager::updateMetadataOnWrite(FILE *fh,
                                                 std::size_t operationSize) {
+#ifdef TIMER
+  Timer timer = Timer(); timer.startTime();
+#endif
 #ifdef RELEASE
   if(fh == nullptr || operationSize == 0) return METADATA_UPDATE_FAILED__WRITE;
 #endif /*RELEASE*/
@@ -178,11 +227,17 @@ int POSIXMetadataManager::updateMetadataOnWrite(FILE *fh,
       fileOffset + operationSize > created_files[filename].st_size
       ? fileOffset + operationSize : created_files[filename].st_size;
   updateFpPosition(fh, operationSize, SEEK_CUR, filename);
+#ifdef TIMER
+  timer.endTime(__FUNCTION__);
+#endif
   return OPERATION_SUCCESSFUL;
 }
 
 int POSIXMetadataManager::updateFpPosition(FILE *fh, long int offset,
                                            int origin, const char * filename) {
+#ifdef TIMER
+  Timer timer = Timer(); timer.startTime();
+#endif
 #ifdef RELEASE
   if(fh == nullptr) return UPDATE_FILE_POINTER_FAILED;
 #endif /*RELEASE*/
@@ -220,14 +275,23 @@ int POSIXMetadataManager::updateFpPosition(FILE *fh, long int offset,
       fprintf(stderr, "Seek origin fault!\n");
       return UPDATE_FILE_POINTER_FAILED;
   }
+#ifdef TIMER
+  timer.endTime(__FUNCTION__);
+#endif
   return OPERATION_SUCCESSFUL;
 }
 
 long int POSIXMetadataManager::getFpPosition(FILE *fh) {
+#ifdef TIMER
+  Timer timer = Timer(); timer.startTime();
+#endif
 #ifdef RELEASE
   if(fh == nullptr) return -1;
 #endif /*RELEASE*/
   auto index = pointer.find(fh);
+#ifdef TIMER
+  timer.endTime(__FUNCTION__);
+#endif
   if(index == pointer.end()) return -1;
   else return index->second; //holds the offset
 }
@@ -236,12 +300,18 @@ long int POSIXMetadataManager::getFpPosition(FILE *fh) {
 *Functions
 ******************************************************************************/
 long int POSIXMetadataManager::getFilesize(const char *filename) {
+#ifdef TIMER
+  Timer timer = Timer(); timer.startTime();
+#endif
 #ifdef RELEASE
   if(!checkIfFileExists(filename) || std::strlen(filename) > MAX_FILENAME_LENGTH)
     return -1;
 #endif /*RELEASE*/
   auto iterator = created_files.find(filename);
   if(iterator == created_files.end()) return -1;
+#ifdef TIMER
+  timer.endTime(__FUNCTION__);
+#endif
   return iterator->second.st_size;
 }
 
