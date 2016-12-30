@@ -13,7 +13,8 @@ int PVFS2Client::fopen(VirtualFile &virtualFile) {
   int status=s3MetadataManager->getFileHandler(virtualFile);
   if(status!=OPERATION_SUCCESSFUL){
     FILE *fh;
-    fh=std::fopen(virtualFile.getFilename().c_str(),"w+");
+    std::string filePath = TEMP_LOCATION + virtualFile.getFilename();
+    fh=std::fopen(filePath.c_str(), "w+");
     void* mmappedData = mmap(NULL,
                              MAX_VF_SIZE,
                              PROT_READ || PROT_WRITE,
@@ -44,7 +45,9 @@ int PVFS2Client::fclose(VirtualFile &virtualFile) {
 
 int PVFS2Client::fread(VirtualFile &virtualFile) {
   std::fread(virtualFile.getData(),sizeof(char),
-             virtualFile.getSize()-virtualFile.getOffset(),virtualFile.getFh());
+               virtualFile.getSize()-virtualFile.getOffset(),virtualFile.getFh());
+
+
   return OPERATION_SUCCESSFUL;
 }
 

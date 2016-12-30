@@ -18,14 +18,21 @@ int64_t iris::hyperdex_client_get(struct hyperdex_client* client,
   auto pvfs2Client = std::static_pointer_cast<PVFS2Client>
       (apiInstance->getFileSystemFactory()->getFileSystem(PVFS2_CLIENT));
 
-  VirtualFile virtualFile= s3Mapper->generateFiles(key,key_sz);
+  VirtualFile virtualFile= s3Mapper->generateFileForGet(key);
   //todo: error checks
   pvfs2Client->fopen(virtualFile);
   pvfs2Client->fread(virtualFile);
-  hyperdex_client_attribute* attributes[1];
-  attributes[0]->value = (const char *) virtualFile.getData();
-  attributes[0]->value_sz=virtualFile.getSize()-virtualFile.getOffset();
-  attrs=(const hyperdex_client_attribute**)attributes;
+  auto keyIterator=virtualFile.getKeys().find(key);
+  if(keyIterator==virtualFile.getKeys().end()){
+    //TODO:throw error
+  }else{
+    Key keyObject=keyIterator->second;
+    hyperdex_client_attribute* attributes[1];
+    attributes[0]->value=new char[keyObject.size];
+    memcpy((void *) attributes[0]->value, virtualFile.getData() + keyObject.offset, keyObject.size);
+    attributes[0]->value_sz=keyObject.size;
+    attrs=(const hyperdex_client_attribute**)attributes;
+  }
   pvfs2Client->fclose(virtualFile);
   return -1;
 }
@@ -42,8 +49,17 @@ int64_t iris::hyperdex_client_put(struct hyperdex_client *client,
   auto pvfs2Client = std::static_pointer_cast<PVFS2Client>
       (apiInstance->getFileSystemFactory()->getFileSystem(PVFS2_CLIENT));
 
-  VirtualFile virtualFile= s3Mapper->generateFiles(key,key_sz);
-  virtualFile.setData((void *) attrs[0].value);
+  VirtualFile virtualFile= s3Mapper->generateFileForPut(key,attrs[0].value_sz);
+  auto keyIterator=virtualFile.getKeys().find(key);
+  if(keyIterator==virtualFile.getKeys().end()){
+    //TODO:throw error
+  }else{
+    Key keyObject=keyIterator->second;
+    Buffer buffer=Buffer();
+    buffer.append(virtualFile.getData(),virtualFile.getOffset()-keyObject.size);
+    buffer.append(attrs[0].value,keyObject.size);
+    virtualFile.setData(buffer.data());
+  }
   pvfs2Client->fopen(virtualFile);
   pvfs2Client->fwrite(virtualFile);
   pvfs2Client->fclose(virtualFile);

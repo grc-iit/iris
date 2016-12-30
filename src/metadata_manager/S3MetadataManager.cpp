@@ -12,15 +12,14 @@ int S3MetadataManager::getFileHandler(VirtualFile &virtualFile) {
 }
 
 int S3MetadataManager::updateFileHandler(VirtualFile &virtualFile) {
-  filenameToFile[virtualFile.getFilename()] = virtualFile.getFh();
-/*  auto iterator = filenameToFile.find(virtualFile.getFilename());
+  auto iterator = filenameToFile.find(virtualFile.getFilename());
   if(iterator == filenameToFile.end()){
     filenameToFile.insert(std::make_pair(virtualFile.getFilename(),
                                          virtualFile.getFh()));
   }
   else{
     filenameToFile[iterator->first] = virtualFile.getFh();
-  }*/
+  }
   return OPERATION_SUCCESSFUL;
 }
 

@@ -18,6 +18,7 @@
 #include <string>
 #include <future>
 #include <set>
+#include <unordered_map>
 #include "return_codes.h"
 /******************************************************************************
 *Iris library parameters
@@ -77,6 +78,7 @@ static const u_int16_t COORDINATOR_PORT = 1982;
 *File Systems
 ******************************************************************************/
 static const char * PVFS2_CLIENT = "PVFS2_CLIENT";
+static std::string TEMP_LOCATION= "/tmp/files/";
 /******************************************************************************
 *Key structure
 ******************************************************************************/
@@ -96,7 +98,8 @@ private:
   long int offset;
   size_t size;
   void * data;
-  std::set<std::string> keyList;
+  std::unordered_map<std::string,Key > keys;
+  std::unordered_map<std::string,Key > invalidKeys;
   bool filled;
   void * mmappedData;
 
@@ -104,7 +107,8 @@ public:VirtualFile() {
     fh = nullptr;
     offset = 0;
     size = 0;
-    keyList = std::set<std::string>();
+    keys=std::unordered_map<std::string,Key >();
+      invalidKeys=std::unordered_map<std::string,Key >();
     filled=false;
   }
 
@@ -166,10 +170,12 @@ public:VirtualFile() {
     VirtualFile::size = size;
   }
 
-  std::set<std::string> getKeyList()  {
-    return keyList;
+  std::unordered_map<std::string,Key > getKeys()  {
+    return keys;
   }
-
+    std::unordered_map<std::string,Key > getInvalidKeys()  {
+      return invalidKeys;
+    }
 };
 
 #endif //IRIS_CONSTANTS_H
