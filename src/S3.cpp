@@ -15,18 +15,18 @@ int64_t iris::hyperdex_client_get(struct hyperdex_client* client,
   auto apiInstance = API::getInstance();
   auto s3Mapper = std::static_pointer_cast<S3Mapper>
       (apiInstance->getMapperFactory()->getMapper(S3_MAPPER));
-  auto pvfsClient = std::static_pointer_cast<PVFS2Client>
+  auto pvfs2Client = std::static_pointer_cast<PVFS2Client>
       (apiInstance->getFileSystemFactory()->getFileSystem(PVFS2_CLIENT));
 
   VirtualFile virtualFile= s3Mapper->generateFiles(key,key_sz);
   //todo: error checks
-  pvfsClient->fopen(virtualFile);
-  pvfsClient->fread(virtualFile);
+  pvfs2Client->fopen(virtualFile);
+  pvfs2Client->fread(virtualFile);
   hyperdex_client_attribute* attributes[1];
   attributes[0]->value = (const char *) virtualFile.getData();
   attributes[0]->value_sz=virtualFile.getSize()-virtualFile.getOffset();
   attrs=(const hyperdex_client_attribute**)attributes;
-  pvfsClient->fclose(virtualFile);
+  pvfs2Client->fclose(virtualFile);
   return -1;
 }
 
@@ -39,13 +39,13 @@ int64_t iris::hyperdex_client_put(struct hyperdex_client *client,
   auto apiInstance = API::getInstance();
   auto s3Mapper = std::static_pointer_cast<S3Mapper>
       (apiInstance->getMapperFactory()->getMapper(S3_MAPPER));
-
-  auto pvfsClient = std::static_pointer_cast<PVFS2Client>
+  auto pvfs2Client = std::static_pointer_cast<PVFS2Client>
       (apiInstance->getFileSystemFactory()->getFileSystem(PVFS2_CLIENT));
+
   VirtualFile virtualFile= s3Mapper->generateFiles(key,key_sz);
   virtualFile.setData((void *) attrs[0].value);
-  pvfsClient->fopen(virtualFile);
-  pvfsClient->fwrite(virtualFile);
-  pvfsClient->fclose(virtualFile);
+  pvfs2Client->fopen(virtualFile);
+  pvfs2Client->fwrite(virtualFile);
+  pvfs2Client->fclose(virtualFile);
   return -1;
 }

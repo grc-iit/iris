@@ -1,5 +1,5 @@
 /*******************************************************************************
-* File AbstractObjectStore.h
+* File AbstractFileSystem.h
 *
 * Goal:
 *

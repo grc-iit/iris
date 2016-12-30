@@ -3,7 +3,6 @@
 //
 #include <iostream>
 #include <chrono>
-#include <sys/time.h>
 #include "local_tests.h"
 #include "../src/iris.h"
 #include "../src/utils/Timer.h"
@@ -187,24 +186,6 @@ int local_tests::alternateReadandWrite(size_t amount, int count) {
   std::fclose(fh);
   return 0;
 }
-
-char *local_tests::randstring(std::size_t length) {
-  int n;
-  static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-#'?!";
-  char *randomString = NULL;
-  if (length) {
-    randomString = (char *) malloc(sizeof(char) * (length + 1));
-    if (randomString) {
-      for (n = 0; n < length; n++) {
-        int key = rand() % (int) (sizeof(charset) - 1);
-        randomString[n] = charset[key];
-      }
-      randomString[length] = '\0';
-    }
-  }
-  return randomString;
-}
-
 int local_tests::s3test() {
   std::cout << std::endl<< "Alternate TEST\n" <<std::endl;
 
@@ -223,14 +204,33 @@ int local_tests::s3test() {
   const struct hyperdex_client_attribute* attributes = 0;
   std::size_t attributes_sz = 0;
   op_id = iris::hyperdex_client_get(NULL,
-                              SPACE,
-                              "key1",
-                              strlen("key1"),
-                              &op_status,
-                              &attributes,
-                              &attributes_sz);
+                                    SPACE,
+                                    "key1",
+                                    strlen("key1"),
+                                    &op_status,
+                                    &attributes,
+                                    &attributes_sz);
   timer.endTime("IRIS");
   return 0;
 }
+
+char *local_tests::randstring(std::size_t length) {
+  int n;
+  static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-#'?!";
+  char *randomString = NULL;
+  if (length) {
+    randomString = (char *) malloc(sizeof(char) * (length + 1));
+    if (randomString) {
+      for (n = 0; n < length; n++) {
+        int key = rand() % (int) (sizeof(charset) - 1);
+        randomString[n] = charset[key];
+      }
+      randomString[length] = '\0';
+    }
+  }
+  return randomString;
+}
+
+
 
 

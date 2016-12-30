@@ -16,26 +16,22 @@ private:
   static std::shared_ptr<S3Mapper> instance;
   std::unordered_map<std::string, VirtualFile> fileNameToFile;
   size_t hashKey(std::string keyName,std::size_t objectSize);
-    size_t currentFileSize;
-    std::size_t currentHash;
+  size_t currentFileSize;
+  std::size_t currentHash;
   S3Mapper() {
     fileNameToFile = std::unordered_map<std::string, VirtualFile>();
-      currentFileSize=0;
-      currentHash=-1;
+    currentFileSize=0;
+    currentHash=-1;
   }
 public:
   VirtualFile generateFiles(std::string keyName,std::size_t
   objectSize);
 
   static std::shared_ptr<S3Mapper> getInstance() {
-    return instance == nullptr ? instance = std::shared_ptr<S3Mapper>
-        (new S3Mapper())
+    return instance == nullptr ? instance =
+                                     std::shared_ptr<S3Mapper>(new S3Mapper())
                                : instance;
   }
-
-
-
 };
-
 
 #endif //IRIS_S3MAPPER_H

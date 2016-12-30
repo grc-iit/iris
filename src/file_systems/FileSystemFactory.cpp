@@ -5,10 +5,13 @@
 #include <memory>
 #include "FileSystemFactory.h"
 #include "../constants.h"
+#include "PVFS2Client.h"
+
 /******************************************************************************
 *Initialization of static members
 ******************************************************************************/
 std::shared_ptr<FileSystemFactory> FileSystemFactory::instance = nullptr;
+
 std::shared_ptr<AbstractFileSystem>
 FileSystemFactory::getFileSystem(const char *name) {
   std::shared_ptr<AbstractFileSystem> fileSystemClient;

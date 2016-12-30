@@ -56,4 +56,3 @@ MetadataManagerFactory::getMetadataManager(const char *name) {
 
 
 
-

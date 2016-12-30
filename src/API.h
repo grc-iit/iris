@@ -1,5 +1,5 @@
 /*******************************************************************************
-* File AbstractAPI.h
+* File API.h
 *
 * Goal:
 *
@@ -8,8 +8,8 @@
 * Illinois Institute of Technology - SCS Lab
 * (C) 2016
 ******************************************************************************/
-#ifndef IRIS_ABSTRACTAPI_H
-#define IRIS_ABSTRACTAPI_H
+#ifndef IRIS_API_H
+#define IRIS_API_H
 /******************************************************************************
 *include files
 ******************************************************************************/
@@ -35,7 +35,6 @@
 #include "metadata_manager/S3MetadataManager.h"
 #include "object_stores/ObjectStoreFactory.h"
 #include "file_systems/FileSystemFactory.h"
-
 /******************************************************************************
 *Class
 ******************************************************************************/
@@ -69,10 +68,6 @@ public:
                               : instance;
   }
 
-  std::shared_ptr<FileSystemFactory> getFileSystemFactory() {
-    return fileSystemFactory;
-  }
-
   inline std::shared_ptr<CacheManager> getCacheManager(){
     return cacheManager;
   }
@@ -93,6 +88,10 @@ public:
     return objectStoreFactory;
   }
 
+  inline std::shared_ptr<FileSystemFactory> getFileSystemFactory() {
+    return fileSystemFactory;
+  }
+
 };
 
-#endif //IRIS_ABSTRACTAPI_H
+#endif //IRIS_API_H
