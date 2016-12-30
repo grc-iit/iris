@@ -14,13 +14,13 @@
 class S3Mapper: public AbstractMapper {
 private:
   static std::shared_ptr<S3Mapper> instance;
-  std::unordered_map<std::string, VirtualFile> fileNameToFile;
+  std::unordered_map<std::string, VirtualFile> filenameToVirtualfile;
   std::unordered_map<std::string, size_t > keyToHash;
   size_t hashKey(std::string keyName,std::size_t objectSize);
   size_t currentFileSize;
   std::size_t currentHash;
   S3Mapper() {
-    fileNameToFile = std::unordered_map<std::string, VirtualFile>();
+    filenameToVirtualfile = std::unordered_map<std::string, VirtualFile>();
       keyToHash = std::unordered_map<std::string, size_t >();
     currentFileSize=0;
     currentHash=0;

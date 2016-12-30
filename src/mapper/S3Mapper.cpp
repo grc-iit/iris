@@ -18,8 +18,8 @@ objectSize) {
                            + std::to_string(hash)
                            + ".dat";
     VirtualFile virtualFile;
-    auto iterator = fileNameToFile.find(filename);
-    if (iterator == fileNameToFile.end()) {
+    auto iterator = filenameToVirtualfile.find(filename);
+    if (iterator == filenameToVirtualfile.end()) {
         //if file is new create a new Virtual file and set the key parameters
         virtualFile = VirtualFile();
         virtualFile.setFilename(filename);
@@ -46,16 +46,17 @@ objectSize) {
         }else{
             virtualFile.getInvalidKeys().insert(std::make_pair(keyName,keyNameIterator->second));
             virtualFile.setSize(virtualFile.getSize() - keyNameIterator->second.size);
-            virtualFile.getKeys().insert(std::make_pair(keyName,key));
+            virtualFile.getKeys()[keyName] = key;
+            //virtualFile.getKeys().insert(std::make_pair(keyName,key));
         }
-        fileNameToFile.erase(filename);
+        filenameToVirtualfile.erase(filename);
     }
-    if (currentFileSize + objectSize <= MAX_VF_SIZE) {
+    if (currentFileSize + objectSize >= MAX_VF_SIZE) {
         virtualFile.setFilled(true);
     }
     currentFileSize = virtualFile.getSize();
     currentHash = hash;
-    fileNameToFile.insert(std::make_pair(filename, virtualFile));
+    filenameToVirtualfile.insert(std::make_pair(filename, virtualFile));
     return virtualFile;
 }
 
@@ -72,8 +73,8 @@ VirtualFile S3Mapper::generateFileForGet(std::string keyName) {
                            + std::to_string(hash)
                            + ".dat";
     VirtualFile virtualFile;
-    auto iterator = fileNameToFile.find(filename);
-    if (iterator == fileNameToFile.end()) {
+    auto iterator = filenameToVirtualfile.find(filename);
+    if (iterator == filenameToVirtualfile.end()) {
         //TODO: throw key not found
     } else {
         // if file name exist then update the Virtual file with new parameters

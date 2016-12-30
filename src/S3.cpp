@@ -31,7 +31,7 @@ int64_t iris::hyperdex_client_get(struct hyperdex_client* client,
     attributes[0]->value=new char[keyObject.size];
     memcpy((void *) attributes[0]->value, virtualFile.getData() + keyObject.offset, keyObject.size);
     attributes[0]->value_sz=keyObject.size;
-    attrs=(const hyperdex_client_attribute**)attributes;
+    attrs=(const hyperdex_client_attribute**)attributes;//fixme
   }
   pvfs2Client->fclose(virtualFile);
   return -1;
@@ -49,7 +49,7 @@ int64_t iris::hyperdex_client_put(struct hyperdex_client *client,
   auto pvfs2Client = std::static_pointer_cast<PVFS2Client>
       (apiInstance->getFileSystemFactory()->getFileSystem(PVFS2_CLIENT));
 
-  VirtualFile virtualFile= s3Mapper->generateFileForPut(key,attrs[0].value_sz);
+  VirtualFile virtualFile = s3Mapper->generateFileForPut(key,attrs[0].value_sz);
   auto keyIterator=virtualFile.getKeys().find(key);
   if(keyIterator==virtualFile.getKeys().end()){
     //TODO:throw error
