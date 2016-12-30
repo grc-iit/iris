@@ -14,6 +14,7 @@
 *include files
 ******************************************************************************/
 #include <memory>
+#include "PVFS2Client.h"
 #include "AbstractFileSystem.h"
 /******************************************************************************
 *Class
@@ -32,8 +33,8 @@ public:
 /******************************************************************************
 *Getters and setters
 ******************************************************************************/
-  inline static std::shared_ptr<FileSystemFactory> getInstance(){
-    return instance == nullptr ? instance = std::shared_ptr<FileSystemFactory>
+  static std::shared_ptr<FileSystemFactory> getInstance(){
+    return FileSystemFactory::instance == nullptr ? instance = std::shared_ptr<FileSystemFactory>
         (new FileSystemFactory())
                                : instance;
   }

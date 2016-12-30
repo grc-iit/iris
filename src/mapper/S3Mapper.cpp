@@ -3,7 +3,11 @@
 //
 
 #include "S3Mapper.h"
-
+#include "../constants.h"
+/******************************************************************************
+*Initialization of static members
+******************************************************************************/
+std::shared_ptr<S3Mapper> S3Mapper::instance = nullptr;
 VirtualFile S3Mapper::generateFiles(std::string keyName,std::size_t
 objectSize) {
   //first we get the filename from hash function

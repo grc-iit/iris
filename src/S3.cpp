@@ -25,7 +25,7 @@ int64_t iris::hyperdex_client_get(struct hyperdex_client* client,
   hyperdex_client_attribute* attributes[1];
   attributes[0]->value = (const char *) virtualFile.getData();
   attributes[0]->value_sz=virtualFile.getSize()-virtualFile.getOffset();
-  attrs=attributes;
+  attrs=(const hyperdex_client_attribute**)attributes;
   pvfsClient->fclose(virtualFile);
   return -1;
 }

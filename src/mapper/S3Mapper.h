@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <memory>
 #include "AbstractMapper.h"
 #include "../constants.h"
 
@@ -15,11 +16,13 @@ private:
   static std::shared_ptr<S3Mapper> instance;
   std::unordered_map<std::string, VirtualFile> fileNameToFile;
   size_t hashKey(std::string keyName,std::size_t objectSize);
+    size_t currentFileSize;
+    std::size_t currentHash;
   S3Mapper() {
     fileNameToFile = std::unordered_map<std::string, VirtualFile>();
+      currentFileSize=0;
+      currentHash=-1;
   }
-  size_t currentFileSize;
-  std::size_t currentHash;
 public:
   VirtualFile generateFiles(std::string keyName,std::size_t
   objectSize);

@@ -40,8 +40,8 @@ std::shared_ptr<AbstractMapper> MapperFactory::getMapper(const char *name) {
   else if(strcmp(name,PNETCDF_MAPPER)==0){
     mapperInstance = std::shared_ptr<PNETCDFMapper>();
   }
-  else if(name == S3_MAPPER){
-    mapperInstance = std::shared_ptr<S3Mapper>();
+  else if(strcmp(name,S3_MAPPER)==0){
+    mapperInstance = S3Mapper::getInstance();
   }
   else return nullptr;
   return mapperInstance;

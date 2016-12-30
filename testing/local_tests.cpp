@@ -205,4 +205,32 @@ char *local_tests::randstring(std::size_t length) {
   return randomString;
 }
 
+int local_tests::s3test() {
+  std::cout << std::endl<< "Alternate TEST\n" <<std::endl;
+
+  char * write_buf = randstring(1024*1024);
+  char *read_buf = (char *) malloc(1024*1024);
+  Timer timer = Timer(); timer.startTime();
+  enum hyperdex_client_returncode op_status, loop_status;
+  struct hyperdex_client_attribute attribute;
+  std::size_t attribute_sz = 1;
+  attribute.attr =ATTRIBUTE_NAME;
+  attribute.datatype=HYPERDATATYPE_STRING;
+  attribute.value = write_buf;
+  attribute.value_sz = strlen(write_buf);
+  iris::hyperdex_client_put(NULL,"","key1",4,&attribute,1,&op_status);
+  int64_t op_id=0, loop_id=0;
+  const struct hyperdex_client_attribute* attributes = 0;
+  std::size_t attributes_sz = 0;
+  op_id = iris::hyperdex_client_get(NULL,
+                              SPACE,
+                              "key1",
+                              strlen("key1"),
+                              &op_status,
+                              &attributes,
+                              &attributes_sz);
+  timer.endTime("IRIS");
+  return 0;
+}
+
 

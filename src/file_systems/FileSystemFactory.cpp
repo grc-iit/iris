@@ -2,15 +2,18 @@
 // Created by anthony on 12/10/16.
 //
 #include <cstring>
+#include <memory>
 #include "FileSystemFactory.h"
-#include "PVFS2Client.h"
-
+#include "../constants.h"
+/******************************************************************************
+*Initialization of static members
+******************************************************************************/
+std::shared_ptr<FileSystemFactory> FileSystemFactory::instance = nullptr;
 std::shared_ptr<AbstractFileSystem>
 FileSystemFactory::getFileSystem(const char *name) {
   std::shared_ptr<AbstractFileSystem> fileSystemClient;
   if (strcmp(name,PVFS2_CLIENT)==0) {
-    fileSystemClient =
-        std::static_pointer_cast<PVFS2Client>(new PVFS2Client());
+    fileSystemClient = std::shared_ptr<PVFS2Client>(new PVFS2Client());
   }
   return fileSystemClient;
 }
