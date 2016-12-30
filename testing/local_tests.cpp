@@ -1,14 +1,12 @@
 //
 // Created by anthony on 12/24/16.
 //
-
 #include <iostream>
 #include <chrono>
 #include <sys/time.h>
 #include "local_tests.h"
 #include "../src/iris.h"
 #include "../src/utils/Timer.h"
-
 
 int local_tests::simple_open_close(int repetitions) {
   std::cout << std::endl << "Simple Open-Close TEST\n" <<std::endl;
@@ -96,6 +94,7 @@ int local_tests::read_after_write(size_t writeMB, size_t readMB) {
   if(read_buf!= nullptr) free(read_buf);
   return 0;
 }
+
 int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
   std::cout << std::endl<< "MR (Multiple Reads) TEST\n" <<std::endl;
   size_t op_size;

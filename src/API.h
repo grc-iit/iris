@@ -34,6 +34,8 @@
 #include "metadata_manager/PNETCDFMetadataManager.h"
 #include "metadata_manager/S3MetadataManager.h"
 #include "object_stores/ObjectStoreFactory.h"
+#include "file_systems/FileSystemFactory.h"
+
 /******************************************************************************
 *Class
 ******************************************************************************/
@@ -48,6 +50,7 @@ private:
   std::shared_ptr<MetadataManagerFactory> metadataManagerFactory;
   std::shared_ptr<MapperFactory> mapperFactory;
   std::shared_ptr<ObjectStoreFactory> objectStoreFactory;
+  std::shared_ptr<FileSystemFactory> fileSystemFactory;
 
 /******************************************************************************
 *Constructors
@@ -64,6 +67,10 @@ public:
   inline static std::shared_ptr<API> getInstance(){
     return instance== nullptr ? instance=std::shared_ptr<API>(new API())
                               : instance;
+  }
+
+  std::shared_ptr<FileSystemFactory> getFileSystemFactory() {
+    return fileSystemFactory;
   }
 
   inline std::shared_ptr<CacheManager> getCacheManager(){

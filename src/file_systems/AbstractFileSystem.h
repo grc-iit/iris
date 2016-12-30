@@ -1,14 +1,35 @@
-//
-// Created by anthony on 12/10/16.
-//
-
+/*******************************************************************************
+* File AbstractObjectStore.h
+*
+* Goal:
+*
+* Created: December 10th, 2016  - Anthony Kougkas
+ * Updated:
+* Illinois Institute of Technology - SCS Lab
+* (C) 2016
+******************************************************************************/
 #ifndef IRIS_ABSTRACTFILESYSTEM_H
 #define IRIS_ABSTRACTFILESYSTEM_H
-
-
+/******************************************************************************
+*include files
+******************************************************************************/
+#include "../constants.h"
+/******************************************************************************
+*Class
+******************************************************************************/
 class AbstractFileSystem {
-
+public:
+/******************************************************************************
+*Interface
+******************************************************************************/
+  virtual int fopen(VirtualFile &virtualFile) = 0;
+  virtual int fclose(VirtualFile &virtualFile) = 0;
+  virtual int fread(VirtualFile &virtualFile) = 0;
+  virtual int fwrite(VirtualFile &virtualFile) = 0;
+  virtual int fseek(VirtualFile &virtualFiley) = 0;
 };
 
-
 #endif //IRIS_ABSTRACTFILESYSTEM_H
+
+
+

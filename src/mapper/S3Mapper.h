@@ -5,10 +5,32 @@
 #ifndef IRIS_S3MAPPER_H
 #define IRIS_S3MAPPER_H
 
-
+#include <vector>
+#include <unordered_map>
 #include "AbstractMapper.h"
+#include "../constants.h"
 
 class S3Mapper: public AbstractMapper {
+private:
+  static std::shared_ptr<S3Mapper> instance;
+  std::unordered_map<std::string, VirtualFile> fileNameToFile;
+  size_t hashKey(std::string keyName,std::size_t objectSize);
+  S3Mapper() {
+    fileNameToFile = std::unordered_map<std::string, VirtualFile>();
+  }
+  size_t currentFileSize;
+  std::size_t currentHash;
+public:
+  VirtualFile generateFiles(std::string keyName,std::size_t
+  objectSize);
+
+  static std::shared_ptr<S3Mapper> getInstance() {
+    return instance == nullptr ? instance = std::shared_ptr<S3Mapper>
+        (new S3Mapper())
+                               : instance;
+  }
+
+
 
 };
 

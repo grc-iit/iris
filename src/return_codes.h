@@ -19,6 +19,7 @@ typedef enum iris_return_codes{
   UPDATE_FILE_POINTER_FAILED         = 7807,
   PREFETCH_ENGINE_FAILED             = 7808,
   FETCH_FAILED                       = 7809,
+  FH_DOES_NOT_EXIST                  = 7810,
 
 
   HYPERDEX_ADMIN_CREATION_FAILED     = 7900,

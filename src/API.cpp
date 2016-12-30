@@ -12,6 +12,7 @@ API::API() {
   metadataManagerFactory = MetadataManagerFactory::getInstance();
   mapperFactory = MapperFactory::getInstance();
   objectStoreFactory=ObjectStoreFactory::getInstance();
+  fileSystemFactory=FileSystemFactory::getInstance();
 }
 /******************************************************************************
 *Destructor
