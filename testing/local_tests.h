@@ -13,7 +13,7 @@ public:
   static int read_after_write(size_t writeMB, size_t readMB);
   static int multiple_reads(size_t writeMB, size_t readMB);
   static int alternateReadandWrite(size_t amount, int count);
-  static int s3test();
+  static int s3test(size_t amount);
 
 private:
   static char *randstring(std::size_t length);

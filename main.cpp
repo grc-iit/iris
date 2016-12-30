@@ -9,7 +9,7 @@ int main(int argc, char *args[]) {
   //if(status !=0) return -1;
   //local_tests::multiple_reads(20, 7);
   //local_tests::alternateReadandWrite(1,13);
-  local_tests::s3test();
+  local_tests::s3test(100);
   return 0;
 }
 

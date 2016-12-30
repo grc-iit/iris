@@ -186,11 +186,11 @@ int local_tests::alternateReadandWrite(size_t amount, int count) {
   std::fclose(fh);
   return 0;
 }
-int local_tests::s3test() {
+int local_tests::s3test(size_t amount) {
   std::cout << std::endl<< "Alternate TEST\n" <<std::endl;
 
-  char * write_buf = randstring(1024*1024);
-  char *read_buf = (char *) malloc(1024*1024);
+  char * write_buf = randstring(amount*1024*1024);
+  char *read_buf = (char *) malloc(amount*1024*1024);
   Timer timer = Timer(); timer.startTime();
   enum hyperdex_client_returncode op_status, loop_status;
   struct hyperdex_client_attribute attribute;
