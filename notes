@@ -22,8 +22,7 @@ Long Term Tasks
 ################################################################################
 1) Create copy constructors and equal operators
 2) Add comments everywhere
-3) Persist metadata to KVS using Google flatbuffers or boost::serialization
-    (https://github.com/google/flatbuffers)
+3) Persist metadata to KVS (serialize the memory structures)
 4)
 ################################################################################
 

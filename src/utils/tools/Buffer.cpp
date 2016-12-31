@@ -15,7 +15,7 @@ Buffer::Buffer(void *data)
 Buffer::Buffer(size_type s)
     :free_(true)
 {
-  if(s != 0) data_ = new char[s];
+  if(s != 0) data_ = (char*)malloc(s);//new char[s];
   else data_ = 0;
   size_ = capacity_ = s;
 }
@@ -26,7 +26,7 @@ Buffer::Buffer(size_type s, size_type c)
   if(s > c)
     throw std::invalid_argument("size greater than capacity");
 
-  if(s != 0) data_ = new char[s];
+  if(s != 0) data_ = (char*)malloc(s);//new char[s];
   else data_ = 0;
   size_ = s;
   capacity_ = c;
@@ -37,7 +37,7 @@ Buffer::Buffer(const void* d, size_type s)
 {
   if(s != 0)
   {
-    data_ = new char[s];
+    data_ = (char*)malloc(s);//new char[s];
     std::memcpy (data_, d, s);
   }
   else data_ = 0;
@@ -52,7 +52,7 @@ Buffer::Buffer(const void* d, size_type s, size_type c)
 
   if(c != 0)
   {
-    data_ = new char[c];
+    data_ = (char*)malloc(s);//new char[c];
 
     if(s != 0)
       std::memcpy(data_, d, s);
@@ -74,7 +74,7 @@ Buffer::Buffer(const Buffer& x)
 {
   if(x.capacity_ != 0)
   {
-    data_ = new char[x.capacity_];
+    data_ = (char*)malloc(x.capacity_);//new char[x.capacity_];
 
     if(x.size_ != 0)
       std::memcpy (data_, x.data_, x.size_);
@@ -88,7 +88,7 @@ Buffer::Buffer(const Buffer& x)
 ******************************************************************************/
 Buffer::~Buffer()
 {
-  if(free_) delete[] data_;
+  if(free_) free(data_);//delete[] data_;
 }
 /******************************************************************************
 *Interface
@@ -106,8 +106,8 @@ Buffer& Buffer::operator= (const Buffer& x)
   {
     if(x.size_ > capacity_)
     {
-      if(free_) delete[] data_;
-      data_ = new char[x.capacity_];
+      if(free_) free(data_);//delete[] data_;
+      data_ = (char*)malloc(x.capacity_);//new char[x.capacity_];
       capacity_ = x.capacity_;
       free_ = true;
     }
@@ -149,8 +149,8 @@ void Buffer::assign(const void* d, size_type s)
 {
   if(s > capacity_)
   {
-    if(free_) delete[] data_;
-    data_ = new char[s];
+    if(free_) free(data_);//delete[] data_;
+    data_ = (char*)malloc(s);//new char[s];
     capacity_ = s;
     free_ = true;
   }
@@ -219,7 +219,7 @@ bool Buffer::capacity(size_type c)
 
   if(size_ != 0) std::memcpy (d, data_, size_);
 
-  if(free_) delete[] data_;
+  if(free_) free(data_);//delete[] data_;
   data_ = d;
   capacity_ = c;
   free_ = true;

@@ -13,7 +13,7 @@ int local_tests::simple_open_close(int repetitions) {
   Timer timer = Timer(); timer.startTime();
   for(int i =0; i<repetitions; ++i){
     char filename[90];
-    sprintf(filename,"/home/anthony/temp_files/file_%d.dat", i);
+    sprintf(filename,"file_%d.dat", i);
     fh = iris::fopen(filename, "w");
     if(fh == NULL){
       fprintf(stderr, "File Open failed with null fh");
@@ -27,7 +27,7 @@ int local_tests::simple_open_close(int repetitions) {
   timer.startTime();
   for(int i =0; i<repetitions; ++i){
     char filename[90];
-    sprintf(filename,"/home/anthony/temp_files/file_%d.dat", i);
+    sprintf(filename,"/tmp/files/file_%d.dat", i);
     fh = std::fopen(filename, "w");
     if(fh == NULL){
       fprintf(stderr, "File Open failed with NULL fh");
@@ -38,7 +38,7 @@ int local_tests::simple_open_close(int repetitions) {
 
   for(int i =0; i<repetitions; ++i) {
     char filename[90];
-    sprintf(filename,"/home/anthony/temp_files/file_%d.dat", i);
+    sprintf(filename,"/tmp/files/file_%d.dat", i);
     if (remove(filename) != 0) perror("Error deleting file");
   }
   return 0;
@@ -76,18 +76,19 @@ int local_tests::read_after_write(size_t writeMB, size_t readMB) {
 //POSIX
   write_buf = randstring(op_size);
   timer.startTime();
-  fh = std::fopen("/home/anthony/file1.dat", "w");
+  fh = std::fopen("/tmp/files/file1.dat", "w");
   bytes_written = std::fwrite(write_buf, sizeof(char), writeMB * 1024 * 1024, fh);
   /*bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
                      : std::cout<<"Bytes written: " << bytes_written <<
                                 std::endl;*/
   std::fclose(fh);
-  fh = std::fopen("/home/anthony/file1.dat", "r");
+  fh = std::fopen("/tmp/files/file1.dat", "r");
   bytes_read = std::fread(read_buf, sizeof(char), readMB * 1024 * 1024, fh);
   /*bytes_read == 0 ? std::cout <<"File read failed!" <<std::endl
                   : std::cout<<"Bytes read: " << bytes_read << std::endl;*/
   std::fclose(fh);
   timer.endTime("POSIX");
+  if (remove("/tmp/files/file1.dat") != 0) perror("Error deleting file");
 
   if(write_buf != nullptr) free(write_buf);
   if(read_buf!= nullptr) free(read_buf);
@@ -127,7 +128,7 @@ int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
 //POSIX
   bytes_read =0;
   bytes_written =0;
-  fh = std::fopen("/home/anthony/temp/file1.dat", "w");
+  fh = std::fopen("/tmp/files/file1.dat", "w");
   bytes_written = std::fwrite(write_buf, sizeof(char), writeMB * 1024*1024, fh);
   /*bytes_written == 0 ? std::cout <<"File write failed!" <<std::endl
                      : std::cout<<"Bytes written: " << bytes_written <<
@@ -136,7 +137,7 @@ int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
 
 
 
-  fh = std::fopen("/home/anthony/temp/file1.dat", "r");
+  fh = std::fopen("/tmp/files/file1.dat", "r");
   timer.startTime();
   for(size_t i=0; i< writeMB && bytes_read < bytes_written; ++i){
     bytes_read += std::fread(read_buf, sizeof(char), readMB*1024*1024,fh);
@@ -144,6 +145,7 @@ int local_tests::multiple_reads(size_t writeMB, size_t readMB) {
   }
   timer.endTime("POSIX");
   std::fclose(fh);
+  if (remove("/tmp/files/file1.dat") != 0) perror("Error deleting file");
 
   if(write_buf != nullptr) free(write_buf);
   if(read_buf!= nullptr) free(read_buf);
@@ -174,7 +176,7 @@ int local_tests::alternateReadandWrite(size_t amount, int count) {
 //POSIX
   bytes_read =0;
   bytes_written=0;
-  fh = std::fopen("/home/anthony/file.dat", "w+");
+  fh = std::fopen("/tmp/files/file1.dat", "w+");
   timer = Timer(); timer.startTime();
   for(int i=0; i< count; ++i){
     bytes_written += std::fwrite(write_buf, sizeof(char), amount*1024*1024, fh);
@@ -184,8 +186,12 @@ int local_tests::alternateReadandWrite(size_t amount, int count) {
   }
   timer.endTime("POSIX");
   std::fclose(fh);
+  if (remove("/tmp/files/file1.dat") != 0) perror("Error deleting file");
+  if(write_buf != nullptr) free(write_buf);
+  if(read_buf!= nullptr) free(read_buf);
   return 0;
 }
+
 int local_tests::s3test(size_t amount) {
   std::cout << std::endl<< "S3 simple TEST\n" <<std::endl;
 
