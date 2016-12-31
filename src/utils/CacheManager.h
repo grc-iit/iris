@@ -18,7 +18,7 @@
 #include <unordered_map>
 #include <list>
 #include "../constants.h"
-#include "Buffer.h"
+#include "tools/Buffer.h"
 
 /******************************************************************************
 *Class

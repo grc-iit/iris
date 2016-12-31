@@ -1,19 +1,19 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
-
 ### What is this repository for? ###
 
 * Quick summary
 * Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+
 
 ### How do I get set up? ###
 
 * Summary of set up
 * Configuration
 * Dependencies
-* Database configuration
+    
+    -Google tcmalloc (https://github.com/gperftools/gperftools/releases)
+* IRIS configuration
 * How to run tests
 * Deployment instructions
 
@@ -25,5 +25,7 @@ This README would normally document whatever steps are necessary to get your app
 
 ### Who do I talk to? ###
 
-* Repo owner or admin
-* Other community or team contact
+* Anthony Kougkas (PhD) akougkas@hawk.iit.edu
+* Hariharan Devarajan (M.Sc.) jdevarajan@hawk.iit.edu
+* Nikhita Kataria (M.Sc.) nkataria@hawk.iit.edu
+* Dr. Xian-He Sun sun@iit.edu

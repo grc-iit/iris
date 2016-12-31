@@ -6,7 +6,7 @@
 #include "../return_codes.h"
 #include "ObjectStorePrefetcher.h"
 #include "../mapper/POSIXMapper.h"
-#include "Timer.h"
+#include "tools/Timer.h"
 
 /******************************************************************************
 *Constructor

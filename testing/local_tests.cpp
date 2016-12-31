@@ -5,7 +5,7 @@
 #include <chrono>
 #include "local_tests.h"
 #include "../src/iris.h"
-#include "../src/utils/Timer.h"
+#include "../src/utils/tools/Timer.h"
 
 int local_tests::simple_open_close(int repetitions) {
   std::cout << std::endl << "Simple Open-Close TEST\n" <<std::endl;

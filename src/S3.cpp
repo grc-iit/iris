@@ -29,7 +29,8 @@ int64_t iris::hyperdex_client_get(struct hyperdex_client* client,
     Key keyObject=keyIterator->second;
     hyperdex_client_attribute* attributes[1];
     attributes[0]->value=new char[keyObject.size];
-    memcpy((void *) attributes[0]->value, virtualFile.getData() + keyObject.offset, keyObject.size);
+    memcpy((void *) attributes[0]->value, (char*)virtualFile.getData() +
+        keyObject.offset, keyObject.size);
     attributes[0]->value_sz=keyObject.size;
     attrs=(const hyperdex_client_attribute**)attributes;//fixme
   }

@@ -7,20 +7,24 @@ hyperdex daemon -f --listen=127.0.0.1 --listen-port=2012 --coordinator=127.0.0.1
 
 Known BUGS
 ################################################################################
-1) caching mode does not work
+1)
 ################################################################################
 
 OPTIMIZATIONS
 ################################################################################
 1) Mapper saves a map of collection of keys for a given range of offsets
 2) Change Key to a class and store the maps and implement the equal operator
+3) Use Google's tcmalloc (Done)
+4) Use Google's CityHash (https://github.com/google/cityhash)
 ################################################################################
 
 Long Term Tasks
 ################################################################################
 1) Create copy constructors and equal operators
 2) Add comments everywhere
-3) Persist metadata to KVS using flatbuffers
+3) Persist metadata to KVS using Google flatbuffers or boost::serialization
+    (https://github.com/google/flatbuffers)
+4)
 ################################################################################
 
 Test Plan

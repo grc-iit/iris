@@ -5,7 +5,7 @@
 #include <iostream>
 #include "POSIXMetadataManager.h"
 #include "../constants.h"
-#include "../utils/Timer.h"
+#include "../utils/tools/Timer.h"
 
 /******************************************************************************
 *Constructor
