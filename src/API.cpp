@@ -13,6 +13,7 @@ API::API() {
   mapperFactory = MapperFactory::getInstance();
   objectStoreFactory=ObjectStoreFactory::getInstance();
   fileSystemFactory=FileSystemFactory::getInstance();
+  aggregatorFactory = AggregatorFactory::getInstance();
 }
 /******************************************************************************
 *Destructor

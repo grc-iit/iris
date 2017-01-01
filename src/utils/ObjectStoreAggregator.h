@@ -6,7 +6,9 @@
 #define IRIS_OBJECTSTOREAGGREGATOR_H
 
 
-class ObjectStoreAggregator {
+#include "AbstractAggregator.h"
+
+class ObjectStoreAggregator: public AbstractAggregator {
 
 };
 

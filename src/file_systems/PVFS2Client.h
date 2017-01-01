@@ -12,18 +12,17 @@
 
 class PVFS2Client: public AbstractFileSystem {
 private:
-
   std::shared_ptr<MetadataManagerFactory> metadataManagerFactory;
 public:
-  virtual int fopen(VirtualFile &virtualFile) override;
+  virtual int fopen(Container &container) override;
 
-  virtual int fclose(VirtualFile &virtualFile) override;
+  virtual int fclose(Container &container) override;
 
-  virtual int fread(VirtualFile &virtualFile) override;
+  virtual int fread(Container &container) override;
 
-  virtual int fwrite(VirtualFile &virtualFile) override;
+  virtual int fwrite(Container &container) override;
 
-  virtual int fseek(VirtualFile &virtualFiley) override;
+  virtual int fseek(Container &container) override;
 
   PVFS2Client() {
     metadataManagerFactory=MetadataManagerFactory::getInstance();

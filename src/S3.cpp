@@ -18,7 +18,7 @@ int64_t iris::hyperdex_client_get(struct hyperdex_client* client,
   auto pvfs2Client = std::static_pointer_cast<PVFS2Client>
       (apiInstance->getFileSystemFactory()->getFileSystem(PVFS2_CLIENT));
 
-  VirtualFile virtualFile= s3Mapper->generateFileForGet(key);
+  Container virtualFile= s3Mapper->generateFileForGet(key);
   //todo: error checks
   pvfs2Client->fopen(virtualFile);
   pvfs2Client->fread(virtualFile);
@@ -47,10 +47,41 @@ int64_t iris::hyperdex_client_put(struct hyperdex_client *client,
   auto apiInstance = API::getInstance();
   auto s3Mapper = std::static_pointer_cast<S3Mapper>
       (apiInstance->getMapperFactory()->getMapper(S3_MAPPER));
+  auto s3MetadataManager = std::static_pointer_cast<S3MetadataManager>
+      (apiInstance->getMetadataManagerFactory()->getMetadataManager(S3_METADATA_MANAGER));
   auto pvfs2Client = std::static_pointer_cast<PVFS2Client>
       (apiInstance->getFileSystemFactory()->getFileSystem(PVFS2_CLIENT));
 
-  VirtualFile virtualFile = s3Mapper->generateFileForPut(key,attrs[0].value_sz);
+  Container container = s3Mapper->mapObject(key, attrs[0].value_sz);
+  Key object;
+  object.name = key;
+  object.size = attrs->value_sz;
+  object.data = (void*)attrs->value;
+  object.offset = 0;
+
+  if(s3MetadataManager->getActiveMemTable().size() + object.size >
+      MEMTABLE_CAPACITY) s3MetadataManager->switchActiveMemTable();
+  s3MetadataManager->getActiveMemTable().insert({object, container});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  Container virtualFile = s3Mapper->generateFileForPut(key,attrs[0].value_sz);
   auto keyIterator=virtualFile.getKeys().find(key);
   if(keyIterator==virtualFile.getKeys().end()){
     //TODO:throw error

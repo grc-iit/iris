@@ -22,11 +22,11 @@ public:
 /******************************************************************************
 *Interface
 ******************************************************************************/
-  virtual int fopen(VirtualFile &virtualFile) = 0;
-  virtual int fclose(VirtualFile &virtualFile) = 0;
-  virtual int fread(VirtualFile &virtualFile) = 0;
-  virtual int fwrite(VirtualFile &virtualFile) = 0;
-  virtual int fseek(VirtualFile &virtualFiley) = 0;
+  virtual int fopen(Container &virtualFile) = 0;
+  virtual int fclose(Container &virtualFile) = 0;
+  virtual int fread(Container &virtualFile) = 0;
+  virtual int fwrite(Container &virtualFile) = 0;
+  virtual int fseek(Container &virtualFiley) = 0;
 };
 
 #endif //IRIS_ABSTRACTFILESYSTEM_H
