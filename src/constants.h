@@ -19,7 +19,6 @@
 #include <future>
 #include <set>
 #include <unordered_map>
-#include <city.h>
 #include "return_codes.h"
 /******************************************************************************
 *Iris library parameters
@@ -31,13 +30,10 @@ static const char * CACHING_MODE = "ON"; // "ON" - "OFF"
 static const char * GET_OPERATION = "GET";
 static const char * PUT_OPERATION = "PUT";
 static const u_int16_t MAX_KEY_LENGTH = 32;
-static const size_t MAX_OBJ_SIZE = 2*1024*1024;
+static const size_t MAX_OBJ_SIZE = 128*1024;
 static const size_t MAX_VF_SIZE = 100*1024*1024;
-static const size_t MAX_NUM_SORTED_TABLES = 8;
-static const u_int64_t CACHE_CAPACITY = 1*1024*1024*1024;
-static const u_int64_t MEMTABLE_CAPACITY = 16*1024*1024;
-static std::future<int> asyncFetch;
-static std::future<int> asyncSortTable;
+static const u_int64_t CACHE_CAPACITY = 1073741824;
+static std::future<int> asyncOperation;
 /******************************************************************************
 *Prefetcher
 ******************************************************************************/
@@ -50,11 +46,6 @@ typedef enum prefetching_modes{
   USER_DEFINED  = 3
 } prefetch_mode;
 static const u_int16_t PREFETCH_MODE = SEQUENTIAL;
-/******************************************************************************
-*Aggregator
-******************************************************************************/
-static const char * FILESYSTEM_AGGREGATOR = "FILESYSTEM_AGGREGATOR";
-static const char * OBJECTSTORE_AGGREGATOR = "OBJECTSTORE_AGGREGATOR";
 /******************************************************************************
 *Metadata Manager
 ******************************************************************************/
@@ -72,7 +63,7 @@ static const char * MPIIO_MAPPER ="MPIIO_MAPPER";
 static const char * HDF5_MAPPER = "HDF5_MAPPER";
 static const char * PNETCDF_MAPPER = "PNETCDF_MAPPER";
 static const char * S3_MAPPER = "S3_MAPPER";
-static const uint64 SEED = 1234567;
+static const u_int32_t SEED = 0;
 /******************************************************************************
 *Object Stores
 ******************************************************************************/
@@ -87,48 +78,56 @@ static const u_int16_t COORDINATOR_PORT = 1982;
 *File Systems
 ******************************************************************************/
 static const char * PVFS2_CLIENT = "PVFS2_CLIENT";
-static std::string WORKING_DIRECTORY= "/tmp/files/";
+static std::string TEMP_LOCATION= "/tmp/files/";
 /******************************************************************************
 *Key structure
 ******************************************************************************/
 struct Key{
-  const char * name;
-  std::size_t offset;
-  std::size_t size;
-  void* data;
+    const char * name;
+    std::size_t offset;
+    std::size_t size;
+    void* data;
 };
 /******************************************************************************
-*Container (of objects) structure
+*Virtual File Structure
 ******************************************************************************/
-class Container{
+class VirtualFile{
 private:
   std::string filename;
   FILE* fh;
-  size_t offset;
+  long int offset;
   size_t size;
   void * data;
-  std::unordered_map<std::string,Key> keys;
-  std::unordered_map<std::string,Key> invalidKeys;
+  std::unordered_map<std::string,Key > keys;
+  std::unordered_map<std::string,Key > invalidKeys;
   bool filled;
+  void * mmappedData;
 
-public:
-  Container() {
+public:VirtualFile() {
     fh = nullptr;
     offset = 0;
     size = 0;
-    keys=std::unordered_map<std::string,Key>();
-    invalidKeys=std::unordered_map<std::string,Key>();
+    keys=std::unordered_map<std::string,Key >();
+      invalidKeys=std::unordered_map<std::string,Key >();
     filled=false;
   }
 
-  virtual ~Container() {}
+  virtual ~VirtualFile() {}
+
+  void * getMmappedData() {
+    return mmappedData;
+  }
+
+  void setMmappedData(void *mmappedData) {
+    VirtualFile::mmappedData = mmappedData;
+  }
 
   bool isFilled() {
     return filled;
   }
 
   void setFilled(bool filled) {
-    Container::filled = filled;
+    VirtualFile::filled = filled;
   }
 
   void *getData() {
@@ -136,7 +135,7 @@ public:
   }
 
   void setData(void *data) {
-    Container::data = data;
+    VirtualFile::data = data;
   }
 
   std::string getFilename() {
@@ -144,7 +143,7 @@ public:
   }
 
   void setFilename(std::string filename) {
-    Container::filename = filename;
+    VirtualFile::filename = filename;
   }
 
   FILE *getFh()  {
@@ -152,15 +151,15 @@ public:
   }
 
   void setFh(FILE *fh) {
-    Container::fh = fh;
+    VirtualFile::fh = fh;
   }
 
-  size_t getOffset()  {
+  long int getOffset()  {
     return offset;
   }
 
-  void setOffset(size_t offset) {
-    Container::offset = offset;
+  void setOffset(long int offset) {
+    VirtualFile::offset = offset;
   }
 
   size_t getSize() {
@@ -168,15 +167,15 @@ public:
   }
 
   void setSize(size_t size) {
-    Container::size = size;
+    VirtualFile::size = size;
   }
 
-  std::unordered_map<std::string,Key > getKeys() {
+  std::unordered_map<std::string,Key > getKeys()  {
     return keys;
   }
-  std::unordered_map<std::string,Key > getInvalidKeys()  {
-    return invalidKeys;
-  }
+    std::unordered_map<std::string,Key > getInvalidKeys()  {
+      return invalidKeys;
+    }
 };
 
 #endif //IRIS_CONSTANTS_H

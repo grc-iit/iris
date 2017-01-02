@@ -35,8 +35,6 @@
 #include "metadata_manager/S3MetadataManager.h"
 #include "object_stores/ObjectStoreFactory.h"
 #include "file_systems/FileSystemFactory.h"
-#include "utils/AggregatorFactory.h"
-
 /******************************************************************************
 *Class
 ******************************************************************************/
@@ -52,7 +50,6 @@ private:
   std::shared_ptr<MapperFactory> mapperFactory;
   std::shared_ptr<ObjectStoreFactory> objectStoreFactory;
   std::shared_ptr<FileSystemFactory> fileSystemFactory;
-  std::shared_ptr<AggregatorFactory> aggregatorFactory;
 
 /******************************************************************************
 *Constructors
@@ -95,9 +92,6 @@ public:
     return fileSystemFactory;
   }
 
-  inline std::shared_ptr<AggregatorFactory> getAggregatorFactory() {
-    return aggregatorFactory;
-  }
 };
 
 #endif //IRIS_API_H

@@ -95,7 +95,7 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
 #ifdef DEBUG
   std::cout << "####################  FREAD ####################" << std::endl;
 #endif/*DEBUG*/
-  if(asyncFetch.valid()) asyncFetch.get();
+  if(asyncOperation.valid()) asyncOperation.get();
 #ifdef TIMER1
   Timer timer = Timer(); timer.startTime();
 #endif
@@ -132,7 +132,7 @@ size_t iris::fread(void *ptr, std::size_t size, std::size_t count, FILE *stream)
 
     bufferIndex+=originalKeySize;
   }
-  asyncFetch= std::async (std::launch::async,
+  asyncOperation= std::async (std::launch::async,
                               &ObjectStorePrefetcher::fetch,
                   objectStorePrefetcher, filename, fileOffset,operationSize, filesize);
   //objectStorePrefetcher->fetch(filename, fileOffset, operationSize, filesize);
@@ -152,7 +152,7 @@ size_t iris::fwrite(const void *ptr, size_t size, size_t count, FILE *stream) {
 #ifdef TIMER1
   Timer timer = Timer(); timer.startTime();
 #endif
-  if(asyncFetch.valid()) asyncFetch.get();
+  if(asyncOperation.valid()) asyncOperation.get();
   auto operationSize = size * count;
   if(operationSize == 0) return 0;
 

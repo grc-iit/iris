@@ -21,7 +21,6 @@ typedef enum iris_return_codes{
   FETCH_FAILED                       = 7809,
   FH_DOES_NOT_EXIST                  = 7810,
 
-  FLUSH_SORTEDTABLES                 = 7820,
 
   HYPERDEX_ADMIN_CREATION_FAILED     = 7900,
   HYPERDEX_CLIENT_CREATION_FAILED    = 7901,
