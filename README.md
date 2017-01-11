@@ -13,6 +13,7 @@
 * Dependencies
     
     -Google tcmalloc (https://github.com/gperftools/gperftools/releases)
+ 
 * IRIS configuration
 * How to run tests
 * Deployment instructions
@@ -27,5 +28,4 @@
 
 * Anthony Kougkas (PhD) akougkas@hawk.iit.edu
 * Hariharan Devarajan (M.Sc.) jdevarajan@hawk.iit.edu
-* Nikhita Kataria (M.Sc.) nkataria@hawk.iit.edu
 * Dr. Xian-He Sun sun@iit.edu
